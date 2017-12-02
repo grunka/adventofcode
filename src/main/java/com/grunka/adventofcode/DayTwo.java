@@ -1,6 +1,8 @@
 package com.grunka.adventofcode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
@@ -49,11 +51,20 @@ public class DayTwo {
 
     private static void part2() {
         System.out.println("Part 2");
+        List<Integer> row = new ArrayList<>();
         processInput(() -> {
-            // check which values are evenly divisible
-            return 0;
-        }, cell -> {
-        });
+            row.sort((a, b) -> Integer.compare(b, a));
+            while (!row.isEmpty()) {
+                int a = row.remove(0);
+                for (int b : row) {
+                    if (a % b == 0) {
+                        row.clear();
+                        return a / b;
+                    }
+                }
+            }
+            throw new Error("None was divisible");
+        }, row::add);
     }
 
     private static void processInput(Supplier<Integer> endOfRow, IntConsumer cellConsumer) {
