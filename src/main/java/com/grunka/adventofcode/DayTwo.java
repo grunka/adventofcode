@@ -39,12 +39,8 @@ public class DayTwo {
         AtomicInteger high = new AtomicInteger(Integer.MIN_VALUE);
         Supplier<Integer> endOfRow = () -> high.getAndSet(Integer.MIN_VALUE) + low.getAndSet(Integer.MAX_VALUE);
         IntConsumer cellConsumer = cell -> {
-            if (cell < low.get()) {
-                low.set(cell);
-            }
-            if (cell > high.get()) {
-                high.set(cell);
-            }
+            low.updateAndGet(previous -> cell < previous ? cell : previous);
+            high.updateAndGet(previous -> cell > previous ? cell : previous);
         };
         processInput(endOfRow, cellConsumer);
     }
