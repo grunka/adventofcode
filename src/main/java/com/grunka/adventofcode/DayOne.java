@@ -1,4 +1,4 @@
-package com.grunka.adventofcode.one;
+package com.grunka.adventofcode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
