@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * http://adventofcode.com/2017/day/2
  */
-public class DayTwo {
+public class Day2 {
     private static final String INPUT = "86\t440\t233\t83\t393\t420\t228\t491\t159\t13\t110\t135\t97\t238\t92\t396\n" +
             "3646\t3952\t3430\t145\t1574\t2722\t3565\t125\t3303\t843\t152\t1095\t3805\t134\t3873\t3024\n" +
             "2150\t257\t237\t2155\t1115\t150\t502\t255\t1531\t894\t2309\t1982\t2418\t206\t307\t2370\n" +
