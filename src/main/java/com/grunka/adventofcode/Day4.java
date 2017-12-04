@@ -1,10 +1,10 @@
 package com.grunka.adventofcode;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Day4 {
     private static final String INPUT = "pphsv ojtou brvhsj cer ntfhlra udeh ccgtyzc zoyzmh jum lugbnk\n" +
@@ -522,16 +522,26 @@ public class Day4 {
 
     public static void main(String[] args) {
         part1();
+        part2();
     }
 
     private static void part1() {
         System.out.println("Part 1");
+        countValid(s -> s);
+    }
+
+    private static void part2() {
+        System.out.println("Part 2");
+        countValid(Word::new);
+    }
+
+    private static <T> void countValid(Function<String, T> wordMapper) {
         AtomicInteger validCounter = new AtomicInteger(0);
         Arrays.stream(INPUT.split("\n")).forEach(row -> {
-            Set<String> words = new HashSet<>();
+            Set<T> words = new HashSet<>();
             AtomicBoolean valid = new AtomicBoolean(true);
             Arrays.stream(row.split(" ")).forEach(word -> {
-                if (!words.add(word)) {
+                if (!words.add(wordMapper.apply(word))) {
                     valid.set(false);
                 }
             });
@@ -540,5 +550,30 @@ public class Day4 {
             }
         });
         System.out.println("validCounter = " + validCounter);
+    }
+
+    private static class Word {
+        final List<String> characters;
+
+        Word(String word) {
+            characters = Arrays.stream(word.split("")).sorted().collect(Collectors.toList());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Word word = (Word) o;
+            return Objects.equals(characters, word.characters);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(characters);
+        }
     }
 }
