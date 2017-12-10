@@ -9,7 +9,24 @@ public class Day6 {
     private static final String TEST_INPUT = "0\t2\t7\t0";
 
     public static void main(String[] args) {
-        int[] memory = Arrays.stream(INPUT.split("\t")).mapToInt(Integer::parseInt).toArray();
+        part1(Arrays.stream(INPUT.split("\t")).mapToInt(Integer::parseInt).toArray());
+        part2(Arrays.stream(INPUT.split("\t")).mapToInt(Integer::parseInt).toArray());
+    }
+
+    private static void part2(int[] memory) {
+        System.out.println("Part 2");
+        redistribute(memory);
+        Set<String> redistributed = redistribute(memory);
+        System.out.println("loop size = " + redistributed.size());
+    }
+
+    private static void part1(int[] memory) {
+        System.out.println("Part 1");
+        Set<String> seen = redistribute(memory);
+        System.out.println(seen.size());
+    }
+
+    private static Set<String> redistribute(int[] memory) {
         Set<String> seen = new HashSet<>();
         while (seen.add(Arrays.toString(memory))) {
             int largestIndex = 0;
@@ -25,8 +42,8 @@ public class Day6 {
             for (int i = startingIndex; i < largestValue + startingIndex; i++) {
                 memory[i % memory.length]++;
             }
-            System.out.println("memory = " + Arrays.toString(memory));
+            //System.out.println("memory = " + Arrays.toString(memory));
         }
-        System.out.println(seen.size());
+        return seen;
     }
 }
