@@ -1,22 +1,38 @@
 package com.grunka.adventofcode;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Day7 {
     public static void main(String[] args) {
-        Map<String, Program> mapping = parseTree(INPUT);
-        Program root = findRoot(mapping);
+        part1(parseTree(INPUT));
+        part2(parseTree(TEST_INPUT));
+    }
+
+    private static void part2(Map<String, Program> mapping) {
+        System.out.println("Part 2");
+        Program unbalanced = findOne(mapping, p -> !p.isBalanced(mapping));
+        System.out.println("unbalanced = " + unbalanced);
+        for (String program : unbalanced.disc) {
+            System.out.println("mapping.get(program).weight = " + mapping.get(program).weight);
+            System.out.println("mapping.get(program).getTotalWeight(mapping) = " + mapping.get(program).getTotalWeight(mapping));
+        }
+    }
+
+    private static void part1(Map<String, Program> mapping) {
+        System.out.println("Part 1");
+        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
+        Program root = findOne(mapping, p -> !allNonRoot.contains(p.name));
         System.out.println("root = " + root);
     }
 
-    private static Program findRoot(Map<String, Program> mapping) {
-        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
-        return mapping.values().stream().filter(p -> !allNonRoot.contains(p.name)).collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+    private static Program findOne(Map<String, Program> mapping, Predicate<Program> filter) {
+        return mapping.values().stream().filter(filter).collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
             if (list.size() == 0) {
-                throw new IllegalStateException("Could not find the root");
+                throw new IllegalStateException("Could not find one element");
             } else if (list.size() > 1) {
-                throw new IllegalStateException("Found more than one root");
+                throw new IllegalStateException("Found more than one element");
             } else {
                 return list.get(0);
             }
@@ -27,17 +43,17 @@ public class Day7 {
         Map<String, Program> mapping = new HashMap<>();
         for (String row : input.split("\n")) {
             String node;
-            String branches;
+            List<String> branches;
             String[] split = row.split(" -> ");
             if (split.length == 2) {
                 node = split[0];
-                branches = split[1];
+                branches = Arrays.stream(split[1].split(", ")).collect(Collectors.toList());
             } else {
                 node = row;
-                branches = "";
+                branches = Collections.emptyList();
             }
             String[] nameAndWeight = node.split(" ");
-            mapping.put(nameAndWeight[0], new Program(nameAndWeight[0], Integer.parseInt(nameAndWeight[1].substring(1, nameAndWeight[1].length() - 1)), Arrays.stream(branches.split(", ")).collect(Collectors.toList())));
+            mapping.put(nameAndWeight[0], new Program(nameAndWeight[0], Integer.parseInt(nameAndWeight[1].substring(1, nameAndWeight[1].length() - 1)), branches));
         }
         return mapping;
     }
@@ -51,6 +67,14 @@ public class Day7 {
             this.name = name;
             this.weight = weight;
             this.disc = disc;
+        }
+
+        public boolean isBalanced(Map<String, Program> mapping) {
+            return disc.isEmpty() || disc.stream().mapToInt(p -> mapping.get(p).getTotalWeight(mapping)).distinct().count() == 1;
+        }
+
+        public int getTotalWeight(Map<String, Program> mapping) {
+            return weight + disc.stream().mapToInt(p -> mapping.get(p).weight).sum();
         }
 
         @Override
