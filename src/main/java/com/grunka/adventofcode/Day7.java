@@ -7,17 +7,29 @@ import java.util.stream.Collectors;
 public class Day7 {
     public static void main(String[] args) {
         part1(parseTree(INPUT));
-        part2(parseTree(TEST_INPUT));
+        part2(parseTree(INPUT));
     }
 
     private static void part2(Map<String, Program> mapping) {
         System.out.println("Part 2");
         Program unbalanced = findOne(mapping, p -> !p.isBalanced(mapping));
         System.out.println("unbalanced = " + unbalanced);
-        for (String program : unbalanced.disc) {
-            System.out.println("mapping.get(program).weight = " + mapping.get(program).weight);
-            System.out.println("mapping.get(program).getTotalWeight(mapping) = " + mapping.get(program).getTotalWeight(mapping));
-        }
+        Map<Integer, Integer> weightCounts = unbalanced.disc.stream().collect(Collectors.toMap(p -> mapping.get(p).getTotalWeight(mapping), p -> 1, (a, b) -> a + b));
+        System.out.println("weightCounts = " + weightCounts);
+        Program needsBalancing = unbalanced.disc.stream()
+                .filter(p -> weightCounts.get(mapping.get(p).getTotalWeight(mapping)) == 1)
+                .map(mapping::get)
+                .findFirst()
+                .orElseThrow(() -> new Error("Could not find the one with the wrong weight"));
+        System.out.println("needsBalancing = " + needsBalancing);
+        Program reference = unbalanced.disc.stream()
+                .filter(p -> weightCounts.get(mapping.get(p).getTotalWeight(mapping)) != 1)
+                .map(mapping::get)
+                .findFirst()
+                .orElseThrow(() -> new Error("Could not find the one with the wrong weight"));
+        System.out.println("reference = " + reference);
+        int correctWeight = reference.getTotalWeight(mapping) - needsBalancing.getDiscWeight(mapping);
+        System.out.println("correctWeight = " + correctWeight);
     }
 
     private static void part1(Map<String, Program> mapping) {
@@ -32,7 +44,7 @@ public class Day7 {
             if (list.size() == 0) {
                 throw new IllegalStateException("Could not find one element");
             } else if (list.size() > 1) {
-                throw new IllegalStateException("Found more than one element");
+                throw new IllegalStateException("Found " + list.size() + " element " + list);
             } else {
                 return list.get(0);
             }
@@ -74,7 +86,11 @@ public class Day7 {
         }
 
         public int getTotalWeight(Map<String, Program> mapping) {
-            return weight + disc.stream().mapToInt(p -> mapping.get(p).weight).sum();
+            return weight + getDiscWeight(mapping);
+        }
+
+        public int getDiscWeight(Map<String, Program> mapping) {
+            return disc.stream().mapToInt(p -> mapping.get(p).weight).sum();
         }
 
         @Override
