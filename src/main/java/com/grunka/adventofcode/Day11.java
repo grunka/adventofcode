@@ -2,21 +2,9 @@ package com.grunka.adventofcode;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Day11 {
-
-    private static final Map<String, String> OPPOSITES = Map.of(
-            "n", "s",
-            "s", "n",
-            "e", "w",
-            "w", "e",
-            "nw", "se",
-            "se", "nw",
-            "ne", "sw",
-            "sw", "ne"
-    );
 
     private static final List<List<String>> SIMPLIFICATIONS = Arrays.asList(
             Arrays.asList("ne", "nw", "n"),
@@ -34,7 +22,15 @@ public class Day11 {
             Arrays.asList("sw", "se", "s"),
             Arrays.asList("sw", "nw", "w"),
             Arrays.asList("sw", "n", "nw"),
-            Arrays.asList("sw", "e", "se")
+            Arrays.asList("sw", "e", "se"),
+            Arrays.asList("n", "s", null),
+            Arrays.asList("s", "n", null),
+            Arrays.asList("e", "w", null),
+            Arrays.asList("w", "e", null),
+            Arrays.asList("nw", "se", null),
+            Arrays.asList("se", "nw", null),
+            Arrays.asList("ne", "sw", null),
+            Arrays.asList("sw", "ne", null)
     );
 
     public static void main(String[] args) {
@@ -49,33 +45,24 @@ public class Day11 {
         System.out.println("input = " + input);
         List<String> directions = Arrays.stream(input.split(",")).collect(Collectors.toList());
         System.out.println("original: " + directions.size());
-        int lastSize = 0;
-        while (lastSize != directions.size()) {
-            lastSize = directions.size();
-            for (int i = 0; i < directions.size(); i++) {
-                String opposite = OPPOSITES.get(directions.get(i));
-                int removable = directions.indexOf(opposite);
-                if (removable != -1) {
-                    directions.remove(removable);
-                    if (removable < i) {
+        for (int i = 0; i < directions.size(); i++) {
+            String direction = directions.get(i);
+            List<List<String>> possibleSimplifications = SIMPLIFICATIONS.stream()
+                    .filter(s -> s.get(0).equals(direction)).collect(Collectors.toList());
+            for (List<String> possibleSimplification : possibleSimplifications) {
+                int replaceable = directions.indexOf(possibleSimplification.get(1));
+                if (replaceable != -1) {
+                    directions.remove(replaceable);
+                    if (replaceable < i) {
                         i--;
                     }
                     directions.remove(i);
-                }
-            }
-            //System.out.println("after opposites: " + directions.size());
-            for (int i = 0; i < directions.size(); i++) {
-                String direction = directions.get(i);
-                List<List<String>> possibleSimplifications = SIMPLIFICATIONS.stream()
-                        .filter(s -> s.get(0).equals(direction)).collect(Collectors.toList());
-                for (List<String> possibleSimplification : possibleSimplifications) {
-                    int removable = directions.indexOf(possibleSimplification.get(1));
-                    if (removable != -1) {
-                        directions.remove(i);
-                        directions.add(i, possibleSimplification.get(2));
-                        directions.remove(removable);
-                        break;
+                    String replacement = possibleSimplification.get(2);
+                    if (replacement != null) {
+                        directions.add(i, replacement);
                     }
+                    i--;
+                    break;
                 }
             }
         }
