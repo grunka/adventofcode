@@ -6,10 +6,21 @@ import java.util.stream.Collectors;
 public class Day7 {
     public static void main(String[] args) {
         Map<String, Program> mapping = parseTree(INPUT);
+        Program root = findRoot(mapping);
+        System.out.println("root = " + root);
+    }
 
+    private static Program findRoot(Map<String, Program> mapping) {
         Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
-        List<Program> roots = mapping.values().stream().filter(p -> !allNonRoot.contains(p.name)).collect(Collectors.toList());
-        System.out.println("roots = " + roots);
+        return mapping.values().stream().filter(p -> !allNonRoot.contains(p.name)).collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+            if (list.size() == 0) {
+                throw new IllegalStateException("Could not find the root");
+            } else if (list.size() > 1) {
+                throw new IllegalStateException("Found more than one root");
+            } else {
+                return list.get(0);
+            }
+        }));
     }
 
     private static Map<String, Program> parseTree(String input) {
