@@ -7,7 +7,7 @@ public class Day7 {
     public static void main(String[] args) {
         Map<String, Program> mapping = parseTree(INPUT);
 
-        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.programs.stream()).collect(Collectors.toSet());
+        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
         List<Program> roots = mapping.values().stream().filter(p -> !allNonRoot.contains(p.name)).collect(Collectors.toList());
         System.out.println("roots = " + roots);
     }
@@ -34,12 +34,12 @@ public class Day7 {
     private static class Program {
         final String name;
         final int weight;
-        final List<String> programs;
+        final List<String> disc;
 
-        private Program(String name, int weight, List<String> programs) {
+        private Program(String name, int weight, List<String> disc) {
             this.name = name;
             this.weight = weight;
-            this.programs = programs;
+            this.disc = disc;
         }
 
         @Override
@@ -47,7 +47,7 @@ public class Day7 {
             return "Program{" +
                     "name='" + name + '\'' +
                     ", weight=" + weight +
-                    ", programs=" + programs +
+                    ", disc=" + disc +
                     '}';
         }
     }
