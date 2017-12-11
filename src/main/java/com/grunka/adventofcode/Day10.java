@@ -22,9 +22,24 @@ public class Day10 {
 
     private static void part2() {
         System.out.println("Part 2");
+        test("a2582a3a0e66e6e86e3812dcb672a272", hashPart2(""));
+        test("33efeb34ea91902bb2f59c9920caa6cd", hashPart2("AoC 2017"));
+        test("3efbe78a8d82f29979031a4aa0b16a9d", hashPart2("1,2,3"));
+        test("63960835bcdc130f0b66d7ff4f6a5a8e", hashPart2("1,2,4"));
+        String result = hashPart2(INPUT);
+        System.out.println("result = " + result);
+    }
+
+    private static void test(String expected, String result) {
+        if (!result.equals(expected)) {
+            throw new IllegalStateException("Got " + result + " when expecting " + expected);
+        }
+    }
+
+    private static String hashPart2(String input) {
         int[] list = IntStream.range(0, 256).toArray();
         int[] lengths = IntStream.concat(
-                Arrays.stream(INPUT.split("")).filter(s -> !s.isEmpty()).mapToInt(s -> s.charAt(0)),
+                Arrays.stream(input.split("")).filter(s -> !s.isEmpty()).mapToInt(s -> s.charAt(0)),
                 IntStream.of(17, 31, 73, 47, 23)
         ).toArray();
         System.out.println("lengths = " + Arrays.toString(lengths));
@@ -38,8 +53,7 @@ public class Day10 {
             }
         }
         System.out.println("blocks = " + Arrays.toString(blocks));
-        String result = Arrays.stream(blocks).mapToObj(Integer::toHexString).collect(Collectors.joining());
-        System.out.println("result = " + result);
+        return Arrays.stream(blocks).mapToObj(i -> String.format("%02x", i)).collect(Collectors.joining());
     }
 
     private static void hash(int[] list, int[] lengths, int rounds) {
