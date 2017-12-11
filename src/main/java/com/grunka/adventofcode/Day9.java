@@ -10,11 +10,13 @@ public class Day9 {
     public static void main(String[] args) {
         AtomicInteger sum = new AtomicInteger();
         AtomicInteger currentValue = new AtomicInteger();
-        parse(INPUT, currentValue::incrementAndGet, () -> sum.addAndGet(currentValue.getAndDecrement()));
+        AtomicInteger deletedCounter = new AtomicInteger();
+        parse(INPUT, currentValue::incrementAndGet, () -> sum.addAndGet(currentValue.getAndDecrement()), deletedCounter::incrementAndGet);
         System.out.println("sum = " + sum);
+        System.out.println("deletedCounter = " + deletedCounter);
     }
 
-    private static void parse(String input, Runnable startGroup, Runnable endGroup) {
+    private static void parse(String input, Runnable startGroup, Runnable endGroup, Runnable deletedGarbage) {
         Stack<STATE> state = new Stack<>();
         for (int i = 0; i < input.length(); i++) {
             char current = input.charAt(i);
@@ -29,6 +31,9 @@ public class Day9 {
                             } else {
                                 throw new IllegalStateException("Closing non garbage");
                             }
+                            break;
+                        default:
+                            deletedGarbage.run();
                             break;
                     }
                 } else {
