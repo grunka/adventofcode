@@ -6,13 +6,16 @@ import java.util.stream.Collectors;
 
 public class Day7 {
     public static void main(String[] args) {
+        part1(parseTree(TEST_INPUT));
         part1(parseTree(INPUT));
+        part2(parseTree(TEST_INPUT));
         part2(parseTree(INPUT));
     }
 
     private static void part2(Map<String, Program> mapping) {
         System.out.println("Part 2");
-        Program unbalanced = findOne(mapping, p -> !p.isBalanced(mapping));
+        Program root = findRoot(mapping);
+        Program unbalanced = findUnbalanced(mapping, root);
         System.out.println("unbalanced = " + unbalanced);
         Map<Integer, Integer> weightCounts = unbalanced.disc.stream().collect(Collectors.toMap(p -> mapping.get(p).getTotalWeight(mapping), p -> 1, (a, b) -> a + b));
         System.out.println("weightCounts = " + weightCounts);
@@ -32,11 +35,32 @@ public class Day7 {
         System.out.println("correctWeight = " + correctWeight);
     }
 
+    private static Program findUnbalanced(Map<String, Program> mapping, Program node) {
+        if (!node.isBalanced(mapping)) {
+            boolean childrenAreBalanced = node.disc.stream().map(n -> mapping.get(n).isBalanced(mapping)).reduce(true, (a, b) -> a && b);
+            if (childrenAreBalanced) {
+                return node;
+            }
+        }
+        for (String program : node.disc) {
+            Program next = mapping.get(program);
+            Program unbalanced = findUnbalanced(mapping, next);
+            if (unbalanced != null) {
+                return unbalanced;
+            }
+        }
+        return null;
+    }
+
     private static void part1(Map<String, Program> mapping) {
         System.out.println("Part 1");
-        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
-        Program root = findOne(mapping, p -> !allNonRoot.contains(p.name));
+        Program root = findRoot(mapping);
         System.out.println("root = " + root);
+    }
+
+    private static Program findRoot(Map<String, Program> mapping) {
+        Set<String> allNonRoot = mapping.values().stream().flatMap(p -> p.disc.stream()).collect(Collectors.toSet());
+        return findOne(mapping, p -> !allNonRoot.contains(p.name));
     }
 
     private static Program findOne(Map<String, Program> mapping, Predicate<Program> filter) {
@@ -81,16 +105,16 @@ public class Day7 {
             this.disc = disc;
         }
 
-        public boolean isBalanced(Map<String, Program> mapping) {
+        boolean isBalanced(Map<String, Program> mapping) {
             return disc.isEmpty() || disc.stream().mapToInt(p -> mapping.get(p).getTotalWeight(mapping)).distinct().count() == 1;
         }
 
-        public int getTotalWeight(Map<String, Program> mapping) {
+        int getTotalWeight(Map<String, Program> mapping) {
             return weight + getDiscWeight(mapping);
         }
 
-        public int getDiscWeight(Map<String, Program> mapping) {
-            return disc.stream().mapToInt(p -> mapping.get(p).weight).sum();
+        int getDiscWeight(Map<String, Program> mapping) {
+            return disc.stream().mapToInt(p -> mapping.get(p).getTotalWeight(mapping)).sum();
         }
 
         @Override
