@@ -7,30 +7,38 @@ import java.util.stream.Collectors;
 public class Day11 {
 
     private static final List<List<String>> SIMPLIFICATIONS = Arrays.asList(
+            Arrays.asList("ne", "sw", null),
             Arrays.asList("ne", "nw", "n"),
             Arrays.asList("ne", "se", "e"),
             Arrays.asList("ne", "s", "se"),
             Arrays.asList("ne", "w", "nw"),
+            Arrays.asList("nw", "se", null),
             Arrays.asList("nw", "ne", "n"),
             Arrays.asList("nw", "sw", "w"),
             Arrays.asList("nw", "s", "sw"),
             Arrays.asList("nw", "e", "ne"),
+            Arrays.asList("se", "nw", null),
             Arrays.asList("se", "sw", "s"),
             Arrays.asList("se", "ne", "e"),
             Arrays.asList("se", "n", "ne"),
             Arrays.asList("se", "w", "sw"),
+            Arrays.asList("sw", "ne", null),
             Arrays.asList("sw", "se", "s"),
             Arrays.asList("sw", "nw", "w"),
             Arrays.asList("sw", "n", "nw"),
             Arrays.asList("sw", "e", "se"),
             Arrays.asList("n", "s", null),
+            Arrays.asList("n", "se", "ne"),
+            Arrays.asList("n", "sw", "nw"),
             Arrays.asList("s", "n", null),
+            Arrays.asList("s", "ne", "se"),
+            Arrays.asList("s", "nw", "sw"),
             Arrays.asList("e", "w", null),
+            Arrays.asList("e", "nw", "ne"),
+            Arrays.asList("e", "sw", "se"),
             Arrays.asList("w", "e", null),
-            Arrays.asList("nw", "se", null),
-            Arrays.asList("se", "nw", null),
-            Arrays.asList("ne", "sw", null),
-            Arrays.asList("sw", "ne", null)
+            Arrays.asList("w", "ne", "nw"),
+            Arrays.asList("w", "se", "sw")
     );
 
     public static void main(String[] args) {
@@ -44,18 +52,17 @@ public class Day11 {
     private static void simplify(String input) {
         System.out.println("input = " + input);
         List<String> directions = Arrays.stream(input.split(",")).collect(Collectors.toList());
-        System.out.println("original: " + directions.size());
+        //System.out.println("original: " + directions.size());
+        int maxDistance = 0;
         for (int i = 0; i < directions.size(); i++) {
             String direction = directions.get(i);
             List<List<String>> possibleSimplifications = SIMPLIFICATIONS.stream()
                     .filter(s -> s.get(0).equals(direction)).collect(Collectors.toList());
             for (List<String> possibleSimplification : possibleSimplifications) {
                 int replaceable = directions.indexOf(possibleSimplification.get(1));
-                if (replaceable != -1) {
+                if (replaceable != -1 && replaceable < i) {
                     directions.remove(replaceable);
-                    if (replaceable < i) {
-                        i--;
-                    }
+                    i--;
                     directions.remove(i);
                     String replacement = possibleSimplification.get(2);
                     if (replacement != null) {
@@ -65,9 +72,15 @@ public class Day11 {
                     break;
                 }
             }
+            if (i + 1 > maxDistance) {
+                maxDistance = i + 1;
+            }
+            //System.out.println("distance = " + (i + 1));
         }
-        System.out.println("after simplification: " + directions.size());
+        //System.out.println("after simplification: " + directions.size());
         System.out.println("directions = " + directions);
+        System.out.println("directions.size() = " + directions.size());
+        System.out.println("maxDistance = " + maxDistance);
         System.out.println();
     }
 
