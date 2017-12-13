@@ -1,44 +1,37 @@
 package com.grunka.adventofcode;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public class Day13 {
     public static void main(String[] args) {
-        int[] firewall = new int[0];
+        int[][] firewall = new int[0][];
         for (String line : INPUT.split("\n")) {
             String[] depthAndRange = line.split(": ");
             int depth = Integer.parseInt(depthAndRange[0]);
             int range = Integer.parseInt(depthAndRange[1]);
             firewall = Arrays.copyOf(firewall, depth + 1);
-            firewall[depth] = range;
-        }
-        int[] scanners = new int[firewall.length];
-        int[] directions = new int[firewall.length];
-        for (int direction = 0; direction < directions.length; direction++) {
-            if (firewall[direction] != 0) {
-                directions[direction] = 1;
-            }
+            firewall[depth] = IntStream.concat(IntStream.range(0, range), IntStream.range(1, range - 1).map(i -> range - i - 1)).toArray();
         }
         int severity = 0;
         for (int position = 0; position < firewall.length; position++) {
-            if (firewall[position] != 0 && scanners[position] == 0) {
+            if (firewall[position] != null && firewall[position][0] == 0) {
                 // caught
-                severity += position * firewall[position];
+                severity += position * (firewall[position].length / 2 + 1);
             }
-            // move scanners
-            for (int depth = 0; depth < scanners.length; depth++) {
-                if (firewall[depth] != 0) {
-                    scanners[depth] += directions[depth];
-                    if (scanners[depth] == 0) {
-                        directions[depth] = 1;
-                    }
-                    if (scanners[depth] == firewall[depth] - 1) {
-                        directions[depth] = -1;
-                    }
+            for (int[] layer : firewall) {
+                if (layer != null) {
+                    rotate(layer);
                 }
             }
         }
         System.out.println("severity = " + severity);
+    }
+
+    private static void rotate(int[] values) {
+        int a = values[0];
+        System.arraycopy(values, 1, values, 0, values.length - 1);
+        values[values.length - 1] = a;
     }
 
     private static final String TEST_INPUT = "0: 3\n" +
