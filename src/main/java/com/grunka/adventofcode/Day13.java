@@ -5,8 +5,57 @@ import java.util.stream.IntStream;
 
 public class Day13 {
     public static void main(String[] args) {
+        part1();
+        part2();
+    }
+
+    private static void part1() {
+        System.out.println("Part 1");
+        int[][] firewall = parseFirewall(INPUT);
+        int severity = calculateSeverity(firewall);
+        System.out.println("severity = " + severity);
+        System.out.println();
+    }
+
+    private static void part2() {
+        System.out.println("Part 2");
+        int[][] firewall = parseFirewall(INPUT);
+        int delay = 0;
+        while (wasCaught(firewall)) {
+            for (int[] layer : firewall) {
+                if (layer != null) {
+                    rotate(layer);
+                }
+            }
+            delay++;
+        }
+        System.out.println("delay = " + delay);
+        System.out.println();
+    }
+
+    private static boolean wasCaught(int[][] firewall) {
+        for (int[] layer : firewall) {
+            if (layer != null && layer[0] == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int calculateSeverity(int[][] firewall) {
+        int severity = 0;
+        for (int i = 0; i < firewall.length; i++) {
+            if (firewall[i] != null && firewall[i][0] == 0) {
+                // caught
+                severity += i * (firewall[i].length / 2 + 1);
+            }
+        }
+        return severity;
+    }
+
+    private static int[][] parseFirewall(String input) {
         int[][] firewall = new int[0][];
-        for (String line : INPUT.split("\n")) {
+        for (String line : input.split("\n")) {
             String[] depthAndRange = line.split(": ");
             int depth = Integer.parseInt(depthAndRange[0]);
             int range = Integer.parseInt(depthAndRange[1]);
@@ -16,14 +65,7 @@ public class Day13 {
                 rotate(firewall[depth]);
             }
         }
-        int severity = 0;
-        for (int position = 0; position < firewall.length; position++) {
-            if (firewall[position] != null && firewall[position][0] == 0) {
-                // caught
-                severity += position * (firewall[position].length / 2 + 1);
-            }
-        }
-        System.out.println("severity = " + severity);
+        return firewall;
     }
 
     private static void rotate(int[] values) {
