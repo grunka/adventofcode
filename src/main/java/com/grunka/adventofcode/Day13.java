@@ -12,17 +12,15 @@ public class Day13 {
             int range = Integer.parseInt(depthAndRange[1]);
             firewall = Arrays.copyOf(firewall, depth + 1);
             firewall[depth] = IntStream.concat(IntStream.range(0, range), IntStream.range(1, range - 1).map(i -> range - i - 1)).toArray();
+            for (int i = 0; i < depth; i++) {
+                rotate(firewall[depth]);
+            }
         }
         int severity = 0;
         for (int position = 0; position < firewall.length; position++) {
             if (firewall[position] != null && firewall[position][0] == 0) {
                 // caught
                 severity += position * (firewall[position].length / 2 + 1);
-            }
-            for (int[] layer : firewall) {
-                if (layer != null) {
-                    rotate(layer);
-                }
             }
         }
         System.out.println("severity = " + severity);
