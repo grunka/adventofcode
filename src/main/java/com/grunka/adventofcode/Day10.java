@@ -22,11 +22,11 @@ public class Day10 {
 
     private static void part2() {
         System.out.println("Part 2");
-        test("a2582a3a0e66e6e86e3812dcb672a272", hashPart2(""));
-        test("33efeb34ea91902bb2f59c9920caa6cd", hashPart2("AoC 2017"));
-        test("3efbe78a8d82f29979031a4aa0b16a9d", hashPart2("1,2,3"));
-        test("63960835bcdc130f0b66d7ff4f6a5a8e", hashPart2("1,2,4"));
-        String result = hashPart2(INPUT);
+        test("a2582a3a0e66e6e86e3812dcb672a272", knotHash(""));
+        test("33efeb34ea91902bb2f59c9920caa6cd", knotHash("AoC 2017"));
+        test("3efbe78a8d82f29979031a4aa0b16a9d", knotHash("1,2,3"));
+        test("63960835bcdc130f0b66d7ff4f6a5a8e", knotHash("1,2,4"));
+        String result = knotHash(INPUT);
         System.out.println("result = " + result);
     }
 
@@ -36,15 +36,15 @@ public class Day10 {
         }
     }
 
-    private static String hashPart2(String input) {
+    public static String knotHash(String input) {
         int[] list = IntStream.range(0, 256).toArray();
         int[] lengths = IntStream.concat(
                 Arrays.stream(input.split("")).filter(s -> !s.isEmpty()).mapToInt(s -> s.charAt(0)),
                 IntStream.of(17, 31, 73, 47, 23)
         ).toArray();
-        System.out.println("lengths = " + Arrays.toString(lengths));
+        //System.out.println("lengths = " + Arrays.toString(lengths));
         hash(list, lengths, 64);
-        System.out.println("list = " + Arrays.toString(list));
+        //System.out.println("list = " + Arrays.toString(list));
         int[] blocks = new int[16];
         for (int block = 0; block < 16; block++) {
             blocks[block] = list[block * 16];
@@ -52,7 +52,7 @@ public class Day10 {
                 blocks[block] ^= list[block * 16 + element];
             }
         }
-        System.out.println("blocks = " + Arrays.toString(blocks));
+        //System.out.println("blocks = " + Arrays.toString(blocks));
         return Arrays.stream(blocks).mapToObj(i -> String.format("%02x", i)).collect(Collectors.joining());
     }
 
