@@ -31,14 +31,12 @@ public class Day17 {
     }
 
     private static class Buffer {
-        static int size;
         Buffer next;
         final int value;
 
         Buffer(int value) {
             this.value = value;
             this.next = this;
-            size = 1;
         }
 
         Buffer(int value, Buffer next) {
@@ -48,7 +46,6 @@ public class Day17 {
 
         Buffer insert(int value) {
             next = new Buffer(value, next);
-            size++;
             return next;
         }
 
