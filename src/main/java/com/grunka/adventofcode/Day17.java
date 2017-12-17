@@ -20,12 +20,10 @@ public class Day17 {
     }
 
     private static Buffer doInserts(int n) {
-        int steps = 345;
         Buffer buffer = new Buffer(0);
         for (int i = 0; i < n; i++) {
-            buffer = buffer.step(steps);
-            buffer = buffer.insert(i + 1);
-            if (i % 100_000 == 0) {
+            buffer = buffer.step().insert(i + 1);
+            if (i % 1_000_000 == 0) {
                 System.out.println("i = " + i);
             }
         }
@@ -62,9 +60,9 @@ public class Day17 {
             return current;
         }
 
-        Buffer step(int steps) {
+        Buffer step() {
             Buffer current = this;
-            for (int i = 0; i < steps; i++) {
+            for (int i = 0; i < 345; i++) {
                 current = current.next;
             }
             return current;
