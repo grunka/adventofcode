@@ -1,5 +1,8 @@
 package com.grunka.adventofcode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Day17 {
     public static void main(String[] args) {
         part1();
@@ -8,58 +11,32 @@ public class Day17 {
 
     private static void part2() {
         System.out.println("Part 2");
-        Buffer buffer = doInserts(50_000_000);
-        System.out.println("buffer.find(0).next.value = " + buffer.find(0).next.value);
+        List<Integer> buffer = doInserts(50_000_000);
+        int position = buffer.indexOf(0);
+        System.out.println("position = " + position);
+        System.out.println("buffer.get(position + 1) = " + buffer.get(position + 1));
     }
 
     private static void part1() {
         System.out.println("Part 1");
-        Buffer buffer = doInserts(2017);
-        System.out.println("buffer.find(2017).next.value = " + buffer.find(2017).next.value);
+        List<Integer> buffer = doInserts(2017);
+        int position = buffer.indexOf(2017);
+        System.out.println("position = " + position);
+        System.out.println("buffer.get(position + 1) = " + buffer.get(position + 1));
     }
 
-    private static Buffer doInserts(int n) {
-        Buffer buffer = new Buffer(0, null);
+    private static List<Integer> doInserts(int n) {
         int position = 0;
         int steps = 345;
+        List<Integer> buffer = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             position = (position + steps) % (i + 1);
-            buffer.get(position).insert(i + 1);
+            buffer.add(position, i + 1);
             position++;
+            if (i % 10_000 == 0) {
+                System.out.println("i = " + i);
+            }
         }
         return buffer;
-    }
-
-    private static class Buffer {
-        final int value;
-        Buffer next;
-
-        Buffer(int value, Buffer next) {
-            this.value = value;
-            this.next = next;
-        }
-
-        void insert(int value) {
-            next = new Buffer(value, next);
-        }
-
-        Buffer get(int index) {
-            Buffer current = this;
-            for (int i = 0; i < index; i++) {
-                current = current.next;
-            }
-            return current;
-        }
-
-        Buffer find(int value) {
-            Buffer current = this;
-            while (current != null) {
-                if (current.value == value) {
-                    return current;
-                }
-                current = current.next;
-            }
-            return null;
-        }
     }
 }
