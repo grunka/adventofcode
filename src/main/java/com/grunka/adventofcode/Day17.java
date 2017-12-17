@@ -8,26 +8,29 @@ public class Day17 {
 
     private static void part2() {
         System.out.println("Part 2");
-        Buffer buffer = doInserts(50_000_000);
-        Buffer zero = buffer.findZero();
-        System.out.println("zero.next.value = " + zero.next.value);
+        int indexOfZero = 0;
+        int position = 0;
+        int valueNextToZero = 0;
+        int steps = 345;
+        for (int i = 0; i < 50_000_000; i++) {
+            position = (position + steps) % (i + 1) + 1;
+            if (position <= indexOfZero) {
+                indexOfZero++;
+            }
+            if (position == indexOfZero + 1) {
+                valueNextToZero = i + 1;
+            }
+        }
+        System.out.println("valueNextToZero = " + valueNextToZero);
     }
 
     private static void part1() {
         System.out.println("Part 1");
-        Buffer buffer = doInserts(2017);
-        System.out.println("buffer.next.value = " + buffer.next.value);
-    }
-
-    private static Buffer doInserts(int n) {
         Buffer buffer = new Buffer(0);
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < 2017; i++) {
             buffer = buffer.step().insert(i + 1);
-            if (i % 1_000_000 == 0) {
-                System.out.println("i = " + i);
-            }
         }
-        return buffer;
+        System.out.println("buffer.next.value = " + buffer.next.value);
     }
 
     private static class Buffer {
