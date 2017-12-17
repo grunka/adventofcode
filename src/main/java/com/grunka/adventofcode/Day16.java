@@ -58,16 +58,21 @@ public class Day16 {
     }
 
     private static void exchange(char[] programs, int a, int b) {
-        char p = programs[a];
-        programs[a] = programs[b];
-        programs[b] = p;
+        programs[a] = (char) (programs[a] ^ programs[b]);
+        programs[b] = (char) (programs[b] ^ programs[a]);
+        programs[a] = (char) (programs[a] ^ programs[b]);
     }
 
     private static void spin(char[] programs, int x) {
-        char[] copy = new char[x];
-        System.arraycopy(programs, programs.length - x, copy, 0, x);
-        System.arraycopy(programs, 0, programs, x, programs.length - x);
-        System.arraycopy(copy, 0, programs, 0, x);
+        reverse(programs, 0, programs.length);
+        reverse(programs, 0, x);
+        reverse(programs, x, programs.length - x);
+    }
+
+    private static void reverse(char[] programs, int start, int length) {
+        for (int i = 0; i < length / 2; i++) {
+            exchange(programs, start + i, start + length - i - 1);
+        }
     }
 
     private static char[] createPrograms(int n) {
