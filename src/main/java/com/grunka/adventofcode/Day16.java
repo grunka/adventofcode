@@ -1,21 +1,43 @@
 package com.grunka.adventofcode;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Day16 {
     public static void main(String[] args) {
         char[] programs = createPrograms(16);
-        Arrays.stream(INPUT.split(",")).forEach(move -> {
+        Consumer<char[]> dance = parseDance();
+        dance.accept(programs);
+        System.out.println("programs = " + new String(programs));
+        for (int i = 1; i < 1_000_000_000; i++) {
+            dance.accept(programs);
+            if (i % 1_000 == 0) {
+                System.out.println("i = " + i);
+            }
+        }
+        System.out.println("programs = " + new String(programs));
+    }
+
+    private static Consumer<char[]> parseDance() {
+        List<Consumer<char[]>> moves = new ArrayList<>();
+        for (String move : INPUT.split(",")) {
             if (move.startsWith("s")) {
-                spin(programs, Integer.parseInt(move.substring(1)));
+                int x = Integer.parseInt(move.substring(1));
+                moves.add(p -> spin(p, x));
             } else if (move.startsWith("x")) {
                 String[] ab = move.substring(1).split("/");
-                exchange(programs, Integer.parseInt(ab[0]), Integer.parseInt(ab[1]));
+                int a = Integer.parseInt(ab[0]);
+                int b = Integer.parseInt(ab[1]);
+                moves.add(p -> exchange(p, a, b));
             } else if (move.startsWith("p")) {
-                partner(programs, move.charAt(1), move.charAt(3));
+                char a = move.charAt(1);
+                char b = move.charAt(3);
+                moves.add(p -> partner(p, a, b));
             }
-        });
-        System.out.println("programs = " + new String(programs));
+        }
+        System.out.println("moves.size() = " + moves.size());
+        return programs -> moves.forEach(move -> move.accept(programs));
     }
 
     private static void partner(char[] programs, char a, char b) {
