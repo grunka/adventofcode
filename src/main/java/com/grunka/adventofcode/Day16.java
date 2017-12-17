@@ -1,22 +1,27 @@
 package com.grunka.adventofcode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Day16 {
     public static void main(String[] args) {
         char[] programs = createPrograms(16);
         Consumer<char[]> dance = parseDance();
-        dance.accept(programs);
+        Map<String, String> transitions = new HashMap<>();
+        Function<String, String> nextString = k -> {
+            dance.accept(programs);
+            return new String(programs);
+        };
+        String next = transitions.computeIfAbsent(new String(programs), nextString);
         System.out.println("programs = " + new String(programs));
         for (int i = 1; i < 1_000_000_000; i++) {
-            dance.accept(programs);
-            if (i % 1_000 == 0) {
-                System.out.println("i = " + i);
-            }
+            next = transitions.computeIfAbsent(next, nextString);
         }
-        System.out.println("programs = " + new String(programs));
+        System.out.println("programs = " + next);
     }
 
     private static Consumer<char[]> parseDance() {
