@@ -9,7 +9,7 @@ public class Day17 {
     private static void part2() {
         System.out.println("Part 2");
         Buffer buffer = doInserts(50_000_000);
-        Buffer zero = buffer.find(0);
+        Buffer zero = buffer.findZero();
         System.out.println("zero.next.value = " + zero.next.value);
     }
 
@@ -49,9 +49,9 @@ public class Day17 {
             return next;
         }
 
-        Buffer find(int value) {
+        Buffer findZero() {
             Buffer current = this;
-            while (current.value != value) {
+            while (current.value != 0) {
                 current = current.next;
             }
             return current;
