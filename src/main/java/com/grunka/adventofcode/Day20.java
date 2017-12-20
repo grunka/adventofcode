@@ -1,15 +1,37 @@
 package com.grunka.adventofcode;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Day20 {
     public static void main(String[] args) {
-        List<Particle> particles = Arrays.stream(INPUT.split("\n")).map(Particle::parse).collect(Collectors.toList());
+        part1(Arrays.stream(INPUT.split("\n")).map(Particle::parse).collect(Collectors.toList()));
+        part2(Arrays.stream(INPUT.split("\n")).map(Particle::parse).collect(Collectors.toList()));
+    }
+
+    private static void part2(List<Particle> particles) {
+        for (int i = 0; i < 10_000; i++) {
+            collide(particles);
+            particles.forEach(Particle::step);
+        }
+        System.out.println("particles.size() = " + particles.size());
+    }
+
+    private static void collide(List<Particle> particles) {
+        Map<XYZ, List<Particle>> particlesByLocation = particles.stream().collect(Collectors.toMap(p -> p.position, Collections::singletonList, (a, b) -> {
+            List<Particle> combined = new ArrayList<>(a);
+            combined.addAll(b);
+            return combined;
+        }));
+        particlesByLocation.values().stream().filter(p -> p.size() > 1).forEach(collisions -> {
+            System.out.println("collisions = " + collisions);
+            particles.removeAll(collisions);
+        });
+    }
+
+    private static void part1(List<Particle> particles) {
         while (particles.stream().anyMatch(p -> !p.acceleratingInDirectionOfVelocity())) {
             particles.forEach(Particle::step);
         }
@@ -69,6 +91,19 @@ public class Day20 {
         public int getId() {
             return id;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Particle particle = (Particle) o;
+            return id == particle.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
     }
 
     private static class XYZ {
@@ -100,6 +135,21 @@ public class Day20 {
         @Override
         public String toString() {
             return "<" + x + "," + y + "," + z + ">";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            XYZ xyz = (XYZ) o;
+            return x == xyz.x &&
+                    y == xyz.y &&
+                    z == xyz.z;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, z);
         }
     }
 
