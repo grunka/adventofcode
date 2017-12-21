@@ -5,6 +5,13 @@ import java.util.stream.Collectors;
 
 public class Day21 {
     public static void main(String[] args) {
+        assert "24/13".equals(rotateLeft("12/34"));
+        assert "369/258/147".equals(rotateLeft("123/456/789"));
+        assert "21/43".equals(flipHorizontal("12/34"));
+        assert "34/12".equals(flipVertical("12/34"));
+        assert "321/654/987".equals(flipHorizontal("123/456/789"));
+        assert "789/456/123".equals(flipVertical("123/456/789"));
+
         Map<String, String> rules = new HashMap<>();
         Arrays.stream(INPUT.split("\n")).forEach(rule -> {
             String[] inOut = rule.split(" => ");
@@ -12,26 +19,22 @@ public class Day21 {
                 rules.put(block, inOut[1]);
             }
         });
-        String[] blocks = imageToBlocks(IMAGE);
-        System.out.println("blocks = " + Arrays.toString(blocks));
-        System.out.println("permutations(blocks[0]) = " + permutations(blocks[0]));
-        String image = blocksToImage(blocks);
-        System.out.println("image = " + image);
-        System.out.println("rules = " + rules);
-        String[] newBlocks = process(blocks, rules);
-        String newImage = blocksToImage(newBlocks);
-        System.out.println("newImage = " + newImage);
+        String image = IMAGE;
+        for (int i = 0; i < 5; i++) {
+            image = blocksToImage(process(imageToBlocks(image), rules));
+            System.out.println(image);
+            System.out.println();
+        }
     }
 
     private static Collection<String> permutations(String block) {
         Set<String> result = new HashSet<>();
         result.add(block);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 3; i++) {
             Set<String> additions = new HashSet<>();
             for (String s : result) {
                 additions.add(flipHorizontal(s));
                 additions.add(flipVertical(s));
-                additions.add(flipHorizontal(flipVertical(s)));
                 additions.add(rotateLeft(s));
                 additions.add(rotateLeft(rotateLeft(s)));
                 additions.add(rotateLeft(rotateLeft(rotateLeft(s))));
@@ -98,9 +101,9 @@ public class Day21 {
         if (input.length() == 5) {
             return "" + input.charAt(1) + input.charAt(4) + "/" + input.charAt(0) + input.charAt(3);
         } else if (input.length() == 11) {
-            return "" + input.charAt(2) + input.charAt(6) + input.charAt(0) + "/" +
+            return "" + input.charAt(2) + input.charAt(6) + input.charAt(10) + "/" +
                     input.charAt(1) + input.charAt(5) + input.charAt(9) + "/" +
-                    input.charAt(0) + input.charAt(4) + input.charAt(10);
+                    input.charAt(0) + input.charAt(4) + input.charAt(8);
 
         } else {
             throw new IllegalArgumentException("Unflippable " + input);
