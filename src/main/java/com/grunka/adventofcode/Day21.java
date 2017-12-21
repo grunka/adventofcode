@@ -20,6 +20,7 @@ public class Day21 {
         System.out.println("blocks = " + Arrays.toString(blocks));
         String image = blocksToImage(blocks);
         System.out.println("image = " + image);
+        System.out.println("rules = " + rules);
         String[] newBlocks = process(blocks, rules);
         String newImage = blocksToImage(newBlocks);
         System.out.println("newImage = " + newImage);
@@ -31,10 +32,17 @@ public class Day21 {
 
     private static String blocksToImage(String[] blocks) {
         int blockSize = blocks[0].indexOf("/");
-        System.out.println("blockSize = " + blockSize);
         String[] lines = new String[blocks.length * blockSize];
-        for (int i = 0; i < lines.length; i++) {
-
+        int size = (int) Math.sqrt(blocks.length);
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                for (int line = 0; line < blockSize; line++) {
+                    lines[(y * blockSize) + line] = "";
+                }
+                for (int line = 0; line < blockSize; line++) {
+                    lines[(y * blockSize) + line] += blocks[x + y * size].split("/")[line];
+                }
+            }
         }
         return Arrays.stream(lines).collect(Collectors.joining("\n"));
     }
