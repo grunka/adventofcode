@@ -50,16 +50,20 @@ public class Day21 {
     }
 
     private static String blocksToImage(String[] blocks) {
-        int blockSize = blocks[0].indexOf("/");
-        String[] lines = new String[blocks.length * blockSize];
         int size = (int) Math.sqrt(blocks.length);
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                for (int line = 0; line < blockSize; line++) {
-                    lines[(y * blockSize) + line] = "";
-                }
-                for (int line = 0; line < blockSize; line++) {
-                    lines[(y * blockSize) + line] += blocks[x + y * size].split("/")[line];
+        int blockSize = blocks[0].indexOf("/");
+        String[] lines = new String[size * blockSize];
+        for (int row = 0; row < size; row++) {
+            for (int column = 0; column < size; column++) {
+                String block = blocks[column + row * size];
+                String[] segments = block.split("/");
+                for (int segment = 0; segment < segments.length; segment++) {
+                    int line = row * blockSize + segment;
+                    if (lines[line] == null) {
+                        lines[line] = segments[segment];
+                    } else {
+                        lines[line] += segments[segment];
+                    }
                 }
             }
         }
