@@ -19,14 +19,26 @@ public class Day21 {
                 rules.put(block, inOut[1]);
             }
         });
-        String image = IMAGE;
-        for (int i = 0; i < 5; i++) {
+        String fiveIterations = iterateImage(rules, IMAGE, 5, true);
+        System.out.println("countOn(fiveIterations) = " + countOn(fiveIterations));
+
+        String eighteenIterations = iterateImage(rules, IMAGE, 18, false);
+        System.out.println("countOn(eighteenIterations) = " + countOn(eighteenIterations));
+    }
+
+    private static int countOn(String image) {
+        return image.replaceAll("\\.", "").replaceAll("\n", "").length();
+    }
+
+    private static String iterateImage(Map<String, String> rules, String image, int iterations, boolean print) {
+        for (int i = 0; i < iterations; i++) {
             image = blocksToImage(process(imageToBlocks(image), rules));
-            System.out.println(image);
-            System.out.println();
+            if (print) {
+                System.out.println(image);
+                System.out.println();
+            }
         }
-        int on = image.replaceAll("\\.", "").replaceAll("\n", "").length();
-        System.out.println("on = " + on);
+        return image;
     }
 
     private static Collection<String> permutations(String block) {
