@@ -28,6 +28,7 @@ public class Day21 {
     }
 
     private static Collection<String> permutations(String block) {
+        //TODO this is brute forced, maybe make it not be
         Set<String> result = new HashSet<>();
         result.add(block);
         for (int i = 0; i < 3; i++) {
@@ -41,7 +42,6 @@ public class Day21 {
             }
             result.addAll(additions);
         }
-        System.out.println("result.size() = " + result.size());
         return result;
     }
 
