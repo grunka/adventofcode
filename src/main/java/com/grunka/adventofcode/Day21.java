@@ -20,6 +20,13 @@ public class Day21 {
         System.out.println("blocks = " + Arrays.toString(blocks));
         String image = blocksToImage(blocks);
         System.out.println("image = " + image);
+        String[] newBlocks = process(blocks, rules);
+        String newImage = blocksToImage(newBlocks);
+        System.out.println("newImage = " + newImage);
+    }
+
+    private static String[] process(String[] input, Map<String, String> rules) {
+        return Arrays.stream(input).map(rules::get).toArray(String[]::new);
     }
 
     private static String blocksToImage(String[] blocks) {
