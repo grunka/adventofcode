@@ -25,6 +25,8 @@ public class Day21 {
             System.out.println(image);
             System.out.println();
         }
+        int on = image.replaceAll("\\.", "").replaceAll("\n", "").length();
+        System.out.println("on = " + on);
     }
 
     private static Collection<String> permutations(String block) {
