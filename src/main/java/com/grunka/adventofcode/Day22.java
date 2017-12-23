@@ -8,12 +8,12 @@ import static com.grunka.adventofcode.Day22.Direction.*;
 
 public class Day22 {
     public static void main(String[] args) {
-        assert "...\n#..\n...".equals(clear(new Position(2, 0), TEST_INPUT));
-        assert "..#\n...\n...".equals(clear(new Position(0, 1), TEST_INPUT));
-        assert ".##\n#..\n...".equals(infect(new Position(1, 0), TEST_INPUT));
-        assert "..#\n#..\n..#".equals(infect(new Position(2, 2), TEST_INPUT));
-        assert !isInfected(new Position(1, 1), TEST_INPUT);
-        assert isInfected(new Position(0, 1), TEST_INPUT);
+        assert "...\n#..\n...".equals(set(new Position(2, 0), '.', TEST_INPUT));
+        assert "..#\n...\n...".equals(set(new Position(0, 1), '.', TEST_INPUT));
+        assert ".##\n#..\n...".equals(set(new Position(1, 0), '#', TEST_INPUT));
+        assert "..#\n#..\n..#".equals(set(new Position(2, 2), '#', TEST_INPUT));
+        assert get(new Position(1, 1), TEST_INPUT) == '.';
+        assert get(new Position(0, 1), TEST_INPUT) == '#';
 
 
         String nodes = INPUT;
@@ -22,12 +22,12 @@ public class Day22 {
         int infections = 0;
 
         for (int i = 0; i < 10000; i++) {
-            if (isInfected(position, nodes)) {
-                nodes = clear(position, nodes);
+            if (get(position, nodes) == '#') {
+                nodes = set(position, '.', nodes);
                 direction = direction.turnRight();
             } else {
                 infections++;
-                nodes = infect(position, nodes);
+                nodes = set(position, '#', nodes);
                 direction = direction.turnLeft();
             }
             position = position.move(direction);
@@ -50,21 +50,13 @@ public class Day22 {
         System.out.println("infections = " + infections);
     }
 
-    private static String infect(Position position, String nodes) {
-        return set(position, '#', nodes);
-    }
-
-    private static String clear(Position position, String nodes) {
-        return set(position, '.', nodes);
-    }
-
     private static String set(Position position, char c, String nodes) {
         int columns = countColumns(nodes);
         return nodes.substring(0, position.x + position.y * (columns + 1)) + c + nodes.substring(position.x + position.y * (columns + 1) + 1);
     }
 
-    private static boolean isInfected(Position position, String nodes) {
-        return nodes.charAt(position.x + position.y * (countColumns(nodes) + 1)) == '#';
+    private static char get(Position position, String nodes) {
+        return nodes.charAt(position.x + position.y * (countColumns(nodes) + 1));
     }
 
     private static int countColumns(String nodes) {
