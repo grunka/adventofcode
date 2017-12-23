@@ -16,15 +16,17 @@ public class Day22 {
         assert isInfected(new Position(0, 1), TEST_INPUT);
 
 
-        String nodes = TEST_INPUT;
+        String nodes = INPUT;
         Position position = new Position(countColumns(nodes) / 2, countRows(nodes) / 2);
         Direction direction = UP;
+        int infections = 0;
 
-        for (int i = 0; i < 70; i++) {
+        for (int i = 0; i < 10000; i++) {
             if (isInfected(position, nodes)) {
                 nodes = clear(position, nodes);
                 direction = direction.turnRight();
             } else {
+                infections++;
                 nodes = infect(position, nodes);
                 direction = direction.turnLeft();
             }
@@ -42,9 +44,10 @@ public class Day22 {
                 String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
                 nodes = nodes + "\n" + row;
             }
-            System.out.println(nodes);
-            System.out.println();
+            //System.out.println(nodes);
+            //System.out.println();
         }
+        System.out.println("infections = " + infections);
     }
 
     private static String infect(Position position, String nodes) {
