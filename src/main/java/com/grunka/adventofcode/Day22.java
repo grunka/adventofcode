@@ -92,30 +92,27 @@ public class Day22 {
         UP, DOWN, LEFT, RIGHT;
 
         Direction turnLeft() {
-            switch (this) {
-                case UP:
-                    return LEFT;
-                case DOWN:
-                    return RIGHT;
-                case LEFT:
-                    return DOWN;
-                case RIGHT:
-                    return UP;
-                default:
-                    throw new IllegalStateException();
-            }
+            return getDirection(LEFT, RIGHT, DOWN, UP);
         }
 
         Direction turnRight() {
+            return getDirection(RIGHT, LEFT, UP, DOWN);
+        }
+
+        Direction reverse() {
+            return getDirection(DOWN, UP, RIGHT, LEFT);
+        }
+
+        private Direction getDirection(Direction up, Direction down, Direction left, Direction right) {
             switch (this) {
                 case UP:
-                    return RIGHT;
+                    return up;
                 case DOWN:
-                    return LEFT;
+                    return down;
                 case LEFT:
-                    return UP;
+                    return left;
                 case RIGHT:
-                    return DOWN;
+                    return right;
                 default:
                     throw new IllegalStateException();
             }
