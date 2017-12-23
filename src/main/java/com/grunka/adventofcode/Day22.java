@@ -22,13 +22,23 @@ public class Day22 {
         int infections = 0;
 
         for (int i = 0; i < 10000; i++) {
-            if (get(position, nodes) == '#') {
+            char state = get(position, nodes);
+            switch (state) {
+                case '#':
+                    direction = direction.turnRight();
+                    break;
+                case '.':
+                    direction = direction.turnLeft();
+                    break;
+                case 'F':
+                    direction = direction.reverse();
+                    break;
+            }
+            if (state == '#') {
                 nodes = set(position, '.', nodes);
-                direction = direction.turnRight();
             } else {
                 infections++;
                 nodes = set(position, '#', nodes);
-                direction = direction.turnLeft();
             }
             position = position.move(direction);
             if (position.x < 0) {
