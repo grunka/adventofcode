@@ -1,8 +1,10 @@
 package com.grunka.adventofcode;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
-import static com.grunka.adventofcode.Day22.Direction.UP;
+import static com.grunka.adventofcode.Day22.Direction.*;
 
 public class Day22 {
     public static void main(String[] args) {
@@ -10,30 +12,38 @@ public class Day22 {
         assert "..#\n...\n...".equals(clear(new Position(0, 1), TEST_INPUT));
         assert ".##\n#..\n...".equals(infect(new Position(1, 0), TEST_INPUT));
         assert "..#\n#..\n..#".equals(infect(new Position(2, 2), TEST_INPUT));
+        assert !isInfected(new Position(1, 1), TEST_INPUT);
+        assert isInfected(new Position(0, 1), TEST_INPUT);
 
 
-        String nodes = INPUT;
+        String nodes = TEST_INPUT;
         Position position = new Position(countColumns(nodes) / 2, countRows(nodes) / 2);
         Direction direction = UP;
 
-        if (isInfected(position, nodes)) {
-            nodes = clear(position, nodes);
-            direction = direction.turnLeft();
-        } else {
-            nodes = infect(position, nodes);
-            direction = direction.turnRight();
-        }
-        position = position.move(direction);
-        if (position.x < 0) {
-
-        } else if (position.y < 0) {
-            String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
-            nodes = row + "\n" + nodes;
-
-        } else if (position.x > countColumns(nodes) - 1) {
-
-        } else if (position.y > countRows(nodes) - 1) {
-
+        for (int i = 0; i < 70; i++) {
+            if (isInfected(position, nodes)) {
+                nodes = clear(position, nodes);
+                direction = direction.turnRight();
+            } else {
+                nodes = infect(position, nodes);
+                direction = direction.turnLeft();
+            }
+            position = position.move(direction);
+            if (position.x < 0) {
+                nodes = Arrays.stream(nodes.split("\n")).map(line -> "." + line).collect(Collectors.joining("\n"));
+                position = position.move(RIGHT);
+            } else if (position.y < 0) {
+                String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
+                nodes = row + "\n" + nodes;
+                position = position.move(DOWN);
+            } else if (position.x > countColumns(nodes) - 1) {
+                nodes = Arrays.stream(nodes.split("\n")).map(line -> line + ".").collect(Collectors.joining("\n"));
+            } else if (position.y > countRows(nodes) - 1) {
+                String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
+                nodes = nodes + "\n" + row;
+            }
+            System.out.println(nodes);
+            System.out.println();
         }
     }
 
@@ -51,7 +61,7 @@ public class Day22 {
     }
 
     private static boolean isInfected(Position position, String nodes) {
-        return nodes.charAt(position.x + position.y * countColumns(nodes)) == '#';
+        return nodes.charAt(position.x + position.y * (countColumns(nodes) + 1)) == '#';
     }
 
     private static int countColumns(String nodes) {
