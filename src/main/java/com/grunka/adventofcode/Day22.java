@@ -15,8 +15,15 @@ public class Day22 {
         assert get(new Position(1, 1), TEST_INPUT) == '.';
         assert get(new Position(0, 1), TEST_INPUT) == '#';
 
+        part1();
+        part2();
+    }
 
+    private static void part1() {
         run(INPUT, false, 10000);
+    }
+
+    private static void part2() {
         run(INPUT, true, 10000000);
     }
 
