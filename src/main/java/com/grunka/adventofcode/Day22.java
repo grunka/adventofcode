@@ -21,24 +21,31 @@ public class Day22 {
         Direction direction = UP;
         int infections = 0;
 
-        for (int i = 0; i < 10000; i++) {
+        boolean extended = false;
+        int bursts = 10000;
+
+        for (int i = 0; i < bursts; i++) {
             char state = get(position, nodes);
             switch (state) {
                 case '#':
                     direction = direction.turnRight();
+                    nodes = set(position, extended ? 'F' : '.', nodes);
                     break;
                 case '.':
                     direction = direction.turnLeft();
+                    nodes = set(position, extended ? 'W' : '#', nodes);
+                    if (!extended) {
+                        infections++;
+                    }
                     break;
                 case 'F':
                     direction = direction.reverse();
+                    nodes = set(position, '.', nodes);
                     break;
-            }
-            if (state == '#') {
-                nodes = set(position, '.', nodes);
-            } else {
-                infections++;
-                nodes = set(position, '#', nodes);
+                case 'W':
+                    nodes = set(position, '#', nodes);
+                    infections++;
+                    break;
             }
             position = position.move(direction);
             if (position.x < 0) {
@@ -82,7 +89,7 @@ public class Day22 {
             this.y = y;
         }
 
-        public Position move(Direction direction) {
+        Position move(Direction direction) {
             switch (direction) {
                 case UP:
                     return new Position(x, y - 1);
