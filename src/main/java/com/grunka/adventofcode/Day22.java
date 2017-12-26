@@ -1,36 +1,42 @@
 package com.grunka.adventofcode;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static com.grunka.adventofcode.Day22.Direction.*;
+import static com.grunka.adventofcode.Day22.Direction.UP;
 
 public class Day22 {
     public static void main(String[] args) {
-        assert "...\n#..\n...".equals(set(new Position(2, 0), '.', TEST_INPUT));
-        assert "..#\n...\n...".equals(set(new Position(0, 1), '.', TEST_INPUT));
-        assert ".##\n#..\n...".equals(set(new Position(1, 0), '#', TEST_INPUT));
-        assert "..#\n#..\n..#".equals(set(new Position(2, 2), '#', TEST_INPUT));
-        assert get(new Position(1, 1), TEST_INPUT) == '.';
-        assert get(new Position(0, 1), TEST_INPUT) == '#';
-
         part1();
         part2();
     }
 
     private static void part1() {
+        System.out.println("Part 1");
         run(INPUT, false, 10000);
     }
 
     private static void part2() {
+        System.out.println("Part 2");
         run(INPUT, true, 10000000);
     }
 
-    private static void run(String nodes, boolean extended, int bursts) {
-
-        Position position = new Position(countColumns(nodes) / 2, countRows(nodes) / 2);
+    private static void run(String input, boolean extended, int bursts) {
+        int columns = input.indexOf('\n');
+        int middleHorizontal = columns / 2;
+        int rows = countRows(input);
+        int middleVertical = rows / 2;
+        Map<Position, Character> nodes = new HashMap<>();
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < columns; column++) {
+                nodes.put(
+                        new Position(column - middleHorizontal, row - middleVertical),
+                        input.charAt(column + row * (columns + 1))
+                );
+            }
+        }
+        Position position = new Position(0, 0);
         Direction direction = UP;
         int infections = 0;
         for (int i = 0; i < bursts; i++) {
@@ -38,55 +44,33 @@ public class Day22 {
             switch (state) {
                 case '#':
                     direction = direction.turnRight();
-                    nodes = set(position, extended ? 'F' : '.', nodes);
+                    nodes.put(position, extended ? 'F' : '.');
                     break;
                 case '.':
                     direction = direction.turnLeft();
-                    nodes = set(position, extended ? 'W' : '#', nodes);
+                    nodes.put(position, extended ? 'W' : '#');
                     if (!extended) {
                         infections++;
                     }
                     break;
                 case 'F':
                     direction = direction.reverse();
-                    nodes = set(position, '.', nodes);
+                    nodes.put(position, '.');
                     break;
                 case 'W':
-                    nodes = set(position, '#', nodes);
+                    nodes.put(position, '#');
                     infections++;
                     break;
             }
             position = position.move(direction);
-            if (position.x < 0) {
-                nodes = Arrays.stream(nodes.split("\n")).map(line -> "." + line).collect(Collectors.joining("\n"));
-                position = position.move(RIGHT);
-            } else if (position.y < 0) {
-                String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
-                nodes = row + "\n" + nodes;
-                position = position.move(DOWN);
-            } else if (position.x > countColumns(nodes) - 1) {
-                nodes = Arrays.stream(nodes.split("\n")).map(line -> line + ".").collect(Collectors.joining("\n"));
-            } else if (position.y > countRows(nodes) - 1) {
-                String row = String.join("", Collections.nCopies(countColumns(nodes), "."));
-                nodes = nodes + "\n" + row;
-            }
             //System.out.println(nodes);
             //System.out.println();
         }
         System.out.println("infections = " + infections);
     }
 
-    private static String set(Position position, char c, String nodes) {
-        int columns = countColumns(nodes);
-        return nodes.substring(0, position.x + position.y * (columns + 1)) + c + nodes.substring(position.x + position.y * (columns + 1) + 1);
-    }
-
-    private static char get(Position position, String nodes) {
-        return nodes.charAt(position.x + position.y * (countColumns(nodes) + 1));
-    }
-
-    private static int countColumns(String nodes) {
-        return nodes.indexOf('\n');
+    private static char get(Position position, Map<Position, Character> nodes) {
+        return nodes.computeIfAbsent(position, p -> '.');
     }
 
     private static class Position {
@@ -125,6 +109,14 @@ public class Day22 {
         @Override
         public int hashCode() {
             return Objects.hash(x, y);
+        }
+
+        @Override
+        public String toString() {
+            return "Position{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    '}';
         }
     }
 
