@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Day23 {
     public static void main(String[] args) {
         int[] registers = new int['h' - 'a' + 1];
-        registers[0] = 1;
+        //registers[0] = 1;
         AtomicInteger programPointer = new AtomicInteger();
         AtomicInteger mulCounter = new AtomicInteger();
         BiConsumer<String, Integer> info = (operation, result) -> {
@@ -23,9 +23,13 @@ public class Day23 {
         List<Runnable> instructions = Arrays.stream(INPUT.split("\n")).map(instruction -> {
             String[] parts = instruction.split(" ");
             int registerX = parts[1].charAt(0) - 'a';
-            Supplier<Integer> getY = () -> parts[2].length() == 1 && Character.isLetter(parts[2].charAt(0))
-                    ? registers[parts[2].charAt(0) - 'a']
-                    : Integer.parseInt(parts[2]);
+            Supplier<Integer> getY;
+            if (isRegister(parts[2])) {
+                getY = () -> registers[parts[2].charAt(0) - 'a'];
+            } else {
+                int constantY = parse(parts[2]);
+                getY = () -> constantY;
+            }
             switch (parts[0]) {
                 case "set":
                     return (Runnable) () -> {
@@ -46,15 +50,16 @@ public class Day23 {
                         info.accept("mul", value);
                     };
                 case "jnz":
+                    Supplier<Boolean> nonZeroX;
+                    if (isRegister(parts[1])) {
+                        nonZeroX = () -> registers[parts[1].charAt(0) - 'a'] != 0;
+                    } else {
+                        int constantX = Integer.parseInt(parts[1]);
+                        nonZeroX = () -> constantX != 0;
+                    }
                     return (Runnable) () -> {
-                        int value = getY.get();
-                        int check;
-                        if (parts[1].length() == 1 && Character.isLetter(parts[1].charAt(0))) {
-                            check = registers[parts[1].charAt(0) - 'a'];
-                        } else {
-                            check = Integer.parseInt(parts[1]);
-                        }
-                        if (check != 0) {
+                        if (nonZeroX.get()) {
+                            int value = getY.get();
                             info.accept("jnz", value);
                         }
                     };
@@ -69,6 +74,18 @@ public class Day23 {
         }
         System.out.println("mulCounter = " + mulCounter);
         System.out.println("registers = " + Arrays.toString(registers));
+    }
+
+    private static boolean isRegister(String input) {
+        return input.length() == 1 && Character.isLetter(input.charAt(0));
+    }
+
+    private static int parse(String input) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private static final String INPUT =
