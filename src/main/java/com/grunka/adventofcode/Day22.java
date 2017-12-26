@@ -16,14 +16,15 @@ public class Day22 {
         assert get(new Position(0, 1), TEST_INPUT) == '#';
 
 
-        String nodes = INPUT;
+        run(INPUT, false, 10000);
+        run(INPUT, true, 10000000);
+    }
+
+    private static void run(String nodes, boolean extended, int bursts) {
+
         Position position = new Position(countColumns(nodes) / 2, countRows(nodes) / 2);
         Direction direction = UP;
         int infections = 0;
-
-        boolean extended = false;
-        int bursts = 10000;
-
         for (int i = 0; i < bursts; i++) {
             char state = get(position, nodes);
             switch (state) {
