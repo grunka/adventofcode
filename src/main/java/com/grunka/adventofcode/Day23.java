@@ -3,7 +3,7 @@ package com.grunka.adventofcode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -13,14 +13,15 @@ public class Day23 {
         //registers[0] = 1;
         AtomicInteger programPointer = new AtomicInteger();
         AtomicInteger mulCounter = new AtomicInteger();
-        BiConsumer<String, Integer> info = (operation, result) -> {
-            if ("jnz".equals(operation)) {
-                programPointer.addAndGet(result - 1);
-            } else if ("mul".equals(operation)) {
-                mulCounter.incrementAndGet();
-            }
-        };
-        List<Runnable> instructions = Arrays.stream(INPUT.split("\n")).map(instruction -> {
+        List<Runnable> instructions = parseProgram(registers, programPointer, mulCounter);
+        runProgram(programPointer, instructions);
+        System.out.println("mulCounter = " + mulCounter);
+        System.out.println("registers = " + Arrays.toString(registers));
+    }
+
+    private static List<Runnable> parseProgram(int[] registers, AtomicInteger programPointer, AtomicInteger mulCounter) {
+        Consumer<Integer> jumpHandler = offset -> programPointer.addAndGet(offset - 1);
+        return Arrays.stream(INPUT.split("\n")).map(instruction -> {
             String[] parts = instruction.split(" ");
             int registerX = parts[1].charAt(0) - 'a';
             Supplier<Integer> getY;
@@ -32,22 +33,13 @@ public class Day23 {
             }
             switch (parts[0]) {
                 case "set":
-                    return (Runnable) () -> {
-                        int value = getY.get();
-                        registers[registerX] = value;
-                        info.accept("set", value);
-                    };
+                    return (Runnable) () -> registers[registerX] = getY.get();
                 case "sub":
-                    return (Runnable) () -> {
-                        int value = registers[registerX] - getY.get();
-                        registers[registerX] = value;
-                        info.accept("sub", value);
-                    };
+                    return (Runnable) () -> registers[registerX] = registers[registerX] - getY.get();
                 case "mul":
                     return (Runnable) () -> {
-                        int value = registers[registerX] * getY.get();
-                        registers[registerX] = value;
-                        info.accept("mul", value);
+                        registers[registerX] = registers[registerX] * getY.get();
+                        mulCounter.incrementAndGet();
                     };
                 case "jnz":
                     Supplier<Boolean> nonZeroX;
@@ -59,8 +51,7 @@ public class Day23 {
                     }
                     return (Runnable) () -> {
                         if (nonZeroX.get()) {
-                            int value = getY.get();
-                            info.accept("jnz", value);
+                            jumpHandler.accept(getY.get());
                         }
                     };
                 default:
@@ -69,11 +60,12 @@ public class Day23 {
                     };
             }
         }).collect(Collectors.toList());
+    }
+
+    private static void runProgram(AtomicInteger programPointer, List<Runnable> instructions) {
         while (programPointer.get() < instructions.size()) {
             instructions.get(programPointer.getAndIncrement()).run();
         }
-        System.out.println("mulCounter = " + mulCounter);
-        System.out.println("registers = " + Arrays.toString(registers));
     }
 
     private static boolean isRegister(String input) {
