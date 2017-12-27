@@ -23,6 +23,7 @@ public class Day25 {
                     throw new IllegalStateException("Unrecognized state " + state);
             }
         }
+        System.out.println("tape.countOnes() = " + tape.countOnes());
     }
 
     enum States {
@@ -58,6 +59,17 @@ public class Day25 {
                 right = new Tape();
             }
             return right;
+        }
+
+        int countOnes() {
+            int sum = value ? 1 : 0;
+            if (left != null) {
+                sum += left.countOnes();
+            }
+            if (right != null) {
+                sum += right.countOnes();
+            }
+            return sum;
         }
     }
 
