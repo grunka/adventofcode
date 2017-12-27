@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+//TODO want to figure out a better way of doing part 2
 public class Day23 {
     private static void part2() {
         int count = 0;
