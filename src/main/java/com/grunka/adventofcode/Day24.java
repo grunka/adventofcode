@@ -16,6 +16,10 @@ public class Day24 {
         List<Port> strongestBridge = findStrongestBridge(0, ports, Collections.emptyList());
         System.out.println("strongestBridge = " + strongestBridge);
         System.out.println("strength(strongestBridge) = " + strength(strongestBridge));
+
+        List<Port> longestBridge = findLongestBridge(0, ports, Collections.emptyList());
+        System.out.println("longestBridge = " + longestBridge);
+        System.out.println("strength(longestBridge) = " + strength(longestBridge));
     }
 
     private static List<Port> findStrongestBridge(int next, List<Port> ports, List<Port> bridge) {
@@ -38,6 +42,31 @@ public class Day24 {
             }
         }
         return strongest;
+    }
+
+    private static List<Port> findLongestBridge(int next, List<Port> ports, List<Port> bridge) {
+        List<Port> possibilities = ports.stream()
+                .filter(p -> !bridge.contains(p))
+                .filter(p -> p.has(next))
+                .collect(Collectors.toList());
+        if (possibilities.isEmpty()) {
+            return bridge;
+        }
+        List<Port> longest = Collections.emptyList();
+        for (Port possibility : possibilities) {
+            List<Port> attempt = new ArrayList<>(bridge);
+            attempt.add(possibility);
+            List<Port> possibleLongest = findLongestBridge(possibility.other(next), ports, attempt);
+            if (longest.size() < possibleLongest.size()) {
+                longest = possibleLongest;
+            }
+            if (longest.size() == possibleLongest.size()) {
+                if (strength(possibleLongest) > strength(longest)) {
+                    longest = possibleLongest;
+                }
+            }
+        }
+        return longest;
     }
 
     private static int strength(List<Port> bridge) {
