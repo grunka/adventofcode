@@ -8,13 +8,28 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Day23 {
+    private static void part2() {
+        int count = 0;
+        for (int i = 108400; i <= 125400; i += 17) {
+            for (int a = 2; a < Math.sqrt(i); a++) {
+                if (i % a == 0) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        System.out.println("count = " + count);
+    }
+
     public static void main(String[] args) {
+        part2();
+        System.exit(1);
         int[] registers = new int['h' - 'a' + 1];
-        //registers[0] = 1;
+        registers[0] = 0;
         AtomicInteger programPointer = new AtomicInteger();
         AtomicInteger mulCounter = new AtomicInteger();
         List<Runnable> instructions = parseProgram(registers, programPointer, mulCounter);
-        runProgram(programPointer, instructions);
+        runProgram(programPointer, instructions, registers);
         System.out.println("mulCounter = " + mulCounter);
         System.out.println("registers = " + Arrays.toString(registers));
     }
@@ -62,9 +77,10 @@ public class Day23 {
         }).collect(Collectors.toList());
     }
 
-    private static void runProgram(AtomicInteger programPointer, List<Runnable> instructions) {
+    private static void runProgram(AtomicInteger programPointer, List<Runnable> instructions, int[] registers) {
         while (programPointer.get() < instructions.size()) {
             instructions.get(programPointer.getAndIncrement()).run();
+            System.out.println("registers = " + Arrays.toString(registers));
         }
     }
 
