@@ -1,7 +1,64 @@
 package com.grunka.adventofcode;
 
+import static com.grunka.adventofcode.Day25.States.*;
+
 public class Day25 {
     public static void main(String[] args) {
+        Tape tape = new Tape();
+        States state = A;
+        for (int step = 0; step < 12368930; step++) {
+            switch (state) {
+                case A:
+                    if (tape.isZero()) {
+                        tape.setOne();
+                        tape = tape.right();
+                        state = B;
+                    } else {
+                        tape.setZero();
+                        tape = tape.right();
+                        state = C;
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unrecognized state " + state);
+            }
+        }
+    }
+
+    enum States {
+        A, B, C, D, E, F;
+    }
+
+    private static class Tape {
+        private Tape left = null;
+        private Tape right = null;
+        private boolean value = false;
+
+        boolean isZero() {
+            return !value;
+        }
+
+        void setOne() {
+            value = true;
+        }
+
+        void setZero() {
+            value = false;
+        }
+
+        Tape left() {
+            if (left == null) {
+                left = new Tape();
+            }
+            return left;
+        }
+
+        Tape right() {
+            if (right == null) {
+                right = new Tape();
+            }
+            return right;
+        }
     }
 
     private static final String INPUT =
