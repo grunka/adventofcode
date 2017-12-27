@@ -22,37 +22,57 @@ public class Day25 {
                     break;
                 case B:
                     if (tape.isZero()) {
-
+                        tape.setZero();
+                        tape = tape.left();
+                        state = A;
                     } else {
-
+                        tape.setZero();
+                        tape = tape.right();
+                        state = D;
                     }
                     break;
                 case C:
                     if (tape.isZero()) {
-
+                        tape.setOne();
+                        tape = tape.right();
+                        state = D;
                     } else {
-
+                        tape.setOne();
+                        tape = tape.right();
+                        state = A;
                     }
                     break;
                 case D:
                     if (tape.isZero()) {
-
+                        tape.setOne();
+                        tape = tape.left();
+                        state = E;
                     } else {
-
+                        tape.setZero();
+                        tape = tape.left();
+                        state = D;
                     }
                     break;
                 case E:
                     if (tape.isZero()) {
-
+                        tape.setOne();
+                        tape = tape.right();
+                        state = F;
                     } else {
-
+                        tape.setOne();
+                        tape = tape.left();
+                        state = B;
                     }
                     break;
                 case F:
                     if (tape.isZero()) {
-
+                        tape.setOne();
+                        tape = tape.right();
+                        state = A;
                     } else {
-
+                        tape.setOne();
+                        tape = tape.right();
+                        state = E;
                     }
                     break;
                 default:
