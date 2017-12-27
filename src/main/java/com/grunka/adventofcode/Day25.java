@@ -3,6 +3,7 @@ package com.grunka.adventofcode;
 import static com.grunka.adventofcode.Day25.States.*;
 
 public class Day25 {
+    //TODO could write a parser for the input
     public static void main(String[] args) {
         Tape tape = new Tape();
         States state = A;
@@ -17,6 +18,41 @@ public class Day25 {
                         tape.setZero();
                         tape = tape.right();
                         state = C;
+                    }
+                    break;
+                case B:
+                    if (tape.isZero()) {
+
+                    } else {
+
+                    }
+                    break;
+                case C:
+                    if (tape.isZero()) {
+
+                    } else {
+
+                    }
+                    break;
+                case D:
+                    if (tape.isZero()) {
+
+                    } else {
+
+                    }
+                    break;
+                case E:
+                    if (tape.isZero()) {
+
+                    } else {
+
+                    }
+                    break;
+                case F:
+                    if (tape.isZero()) {
+
+                    } else {
+
                     }
                     break;
                 default:
@@ -72,6 +108,30 @@ public class Day25 {
             return sum;
         }
     }
+
+    private static final String TEST_INPUT =
+            "Begin in state A.\n" +
+                    "Perform a diagnostic checksum after 6 steps.\n" +
+                    "\n" +
+                    "In state A:\n" +
+                    "  If the current value is 0:\n" +
+                    "    - Write the value 1.\n" +
+                    "    - Move one slot to the right.\n" +
+                    "    - Continue with state B.\n" +
+                    "  If the current value is 1:\n" +
+                    "    - Write the value 0.\n" +
+                    "    - Move one slot to the left.\n" +
+                    "    - Continue with state B.\n" +
+                    "\n" +
+                    "In state B:\n" +
+                    "  If the current value is 0:\n" +
+                    "    - Write the value 1.\n" +
+                    "    - Move one slot to the left.\n" +
+                    "    - Continue with state A.\n" +
+                    "  If the current value is 1:\n" +
+                    "    - Write the value 1.\n" +
+                    "    - Move one slot to the right.\n" +
+                    "    - Continue with state A.";
 
     private static final String INPUT =
             "Begin in state A.\n" +
