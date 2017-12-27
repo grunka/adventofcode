@@ -13,38 +13,31 @@ public class Day24 {
             return new Port(Integer.parseInt(port[0]), Integer.parseInt(port[1]));
         }).collect(Collectors.toList());
 
-        List<Port> strongestBridge = findStrongestBridge(0, ports, Collections.emptyList());
+        List<Port> strongestBridge = findBridge(0, ports, Collections.emptyList(), (a, b) -> strength(a) > strength(b) ? a : b);
         System.out.println("strongestBridge = " + strongestBridge);
         System.out.println("strength(strongestBridge) = " + strength(strongestBridge));
 
-        List<Port> longestBridge = findLongestBridge(0, ports, Collections.emptyList());
+        List<Port> longestBridge = findBridge(0, ports, Collections.emptyList(), (a, b) -> {
+            if (a.size() == b.size()) {
+                if (strength(a) > strength(b)) {
+                    return a;
+                }
+            }
+            if (a.size() > b.size()) {
+                return a;
+            } else {
+                return b;
+            }
+        });
         System.out.println("longestBridge = " + longestBridge);
         System.out.println("strength(longestBridge) = " + strength(longestBridge));
     }
 
-    private static List<Port> findStrongestBridge(int next, List<Port> ports, List<Port> bridge) {
-        List<Port> possibilities = ports.stream()
-                .filter(p -> !bridge.contains(p))
-                .filter(p -> p.has(next))
-                .collect(Collectors.toList());
-        if (possibilities.isEmpty()) {
-            return bridge;
-        }
-        List<Port> strongest = Collections.emptyList();
-        for (Port possibility : possibilities) {
-            List<Port> attempt = new ArrayList<>(bridge);
-            attempt.add(possibility);
-            List<Port> possibleStrongest = findStrongestBridge(possibility.other(next), ports, attempt);
-            int previous = strength(strongest);
-            int current = strength(possibleStrongest);
-            if (current > previous) {
-                strongest = possibleStrongest;
-            }
-        }
-        return strongest;
+    private interface BridgePicker {
+        List<Port> pick(List<Port> a, List<Port> b);
     }
 
-    private static List<Port> findLongestBridge(int next, List<Port> ports, List<Port> bridge) {
+    private static List<Port> findBridge(int next, List<Port> ports, List<Port> bridge, BridgePicker picker) {
         List<Port> possibilities = ports.stream()
                 .filter(p -> !bridge.contains(p))
                 .filter(p -> p.has(next))
@@ -52,21 +45,14 @@ public class Day24 {
         if (possibilities.isEmpty()) {
             return bridge;
         }
-        List<Port> longest = Collections.emptyList();
+        List<Port> currentPick = Collections.emptyList();
         for (Port possibility : possibilities) {
             List<Port> attempt = new ArrayList<>(bridge);
             attempt.add(possibility);
-            List<Port> possibleLongest = findLongestBridge(possibility.other(next), ports, attempt);
-            if (longest.size() < possibleLongest.size()) {
-                longest = possibleLongest;
-            }
-            if (longest.size() == possibleLongest.size()) {
-                if (strength(possibleLongest) > strength(longest)) {
-                    longest = possibleLongest;
-                }
-            }
+            List<Port> possiblePick = findBridge(possibility.other(next), ports, attempt, picker);
+            currentPick = picker.pick(currentPick, possiblePick);
         }
-        return longest;
+        return currentPick;
     }
 
     private static int strength(List<Port> bridge) {
