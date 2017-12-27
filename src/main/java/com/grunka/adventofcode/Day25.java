@@ -120,14 +120,18 @@ public class Day25 {
         }
 
         int countOnes() {
-            int sum = value ? 1 : 0;
-            if (left != null) {
-                sum += left.countOnes();
+            Tape tape = this;
+            while (tape.left != null) {
+                tape = tape.left;
             }
-            if (right != null) {
-                sum += right.countOnes();
+            int count = 0;
+            while (tape != null) {
+                if (tape.value) {
+                    count++;
+                }
+                tape = tape.right;
             }
-            return sum;
+            return count;
         }
 
         @Override
