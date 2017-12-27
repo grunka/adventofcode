@@ -106,6 +106,7 @@ public class Day25 {
         Tape left() {
             if (left == null) {
                 left = new Tape();
+                left.right = this;
             }
             return left;
         }
@@ -113,6 +114,7 @@ public class Day25 {
         Tape right() {
             if (right == null) {
                 right = new Tape();
+                right.left = this;
             }
             return right;
         }
@@ -126,6 +128,19 @@ public class Day25 {
                 sum += right.countOnes();
             }
             return sum;
+        }
+
+        @Override
+        public String toString() {
+            return (left != null ? left.leftToString() : "") + (value ? "[1]" : "[0]") + (right != null ? right.rightToString() : "");
+        }
+
+        private String leftToString() {
+            return (left != null ? left.leftToString() + " " : "") + (value ? "1" : "0");
+        }
+
+        private String rightToString() {
+            return (value ? "1" : "0") + (right != null ? " " + right.rightToString() : "");
         }
     }
 
