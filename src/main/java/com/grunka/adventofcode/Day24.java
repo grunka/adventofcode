@@ -1,6 +1,8 @@
 package com.grunka.adventofcode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,11 +12,36 @@ public class Day24 {
             String[] port = row.split("/");
             return new Port(Integer.parseInt(port[0]), Integer.parseInt(port[1]));
         }).collect(Collectors.toList());
-        List<Port> starts = ports.stream().filter(p -> p.has(0)).collect(Collectors.toList());
-        System.out.println("starts = " + starts);
-        for (Port start : starts) {
 
+        List<Port> strongestBridge = findStrongestBridge(0, ports, Collections.emptyList());
+        System.out.println("strongestBridge = " + strongestBridge);
+        System.out.println("strength(strongestBridge) = " + strength(strongestBridge));
+    }
+
+    private static List<Port> findStrongestBridge(int next, List<Port> ports, List<Port> bridge) {
+        List<Port> possibilities = ports.stream()
+                .filter(p -> !bridge.contains(p))
+                .filter(p -> p.has(next))
+                .collect(Collectors.toList());
+        if (possibilities.isEmpty()) {
+            return bridge;
         }
+        List<Port> strongest = Collections.emptyList();
+        for (Port possibility : possibilities) {
+            List<Port> attempt = new ArrayList<>(bridge);
+            attempt.add(possibility);
+            List<Port> possibleStrongest = findStrongestBridge(possibility.other(next), ports, attempt);
+            int previous = strength(strongest);
+            int current = strength(possibleStrongest);
+            if (current > previous) {
+                strongest = possibleStrongest;
+            }
+        }
+        return strongest;
+    }
+
+    private static int strength(List<Port> bridge) {
+        return bridge.stream().mapToInt(Port::strength).sum();
     }
 
     private static class Port {
