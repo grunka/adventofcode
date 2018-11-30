@@ -1,11 +1,11 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Day8 {
+public class Day08 {
     public static void main(String[] args) {
         runInstructions(TEST_INPUT);
         runInstructions(INPUT);

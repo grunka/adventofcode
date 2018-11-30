@@ -1,4 +1,4 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 public class Day17 {
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
-import static com.grunka.adventofcode.Day25.States.*;
+import static com.grunka.adventofcode.twentyseventeen.Day25.States.*;
 
 public class Day25 {
     //TODO could write a parser for the input

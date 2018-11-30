@@ -1,12 +1,12 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.grunka.adventofcode.Day9.STATE.GARBAGE;
-import static com.grunka.adventofcode.Day9.STATE.GROUP;
+import static com.grunka.adventofcode.twentyseventeen.Day09.STATE.GARBAGE;
+import static com.grunka.adventofcode.twentyseventeen.Day09.STATE.GROUP;
 
-public class Day9 {
+public class Day09 {
     public static void main(String[] args) {
         AtomicInteger sum = new AtomicInteger();
         AtomicInteger currentValue = new AtomicInteger();

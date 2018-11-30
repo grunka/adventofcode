@@ -1,4 +1,4 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class Day3 {
+public class Day03 {
     private static final int INPUT = 361527;
 
     private enum Direction {

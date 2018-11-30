@@ -1,4 +1,4 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.*;
 

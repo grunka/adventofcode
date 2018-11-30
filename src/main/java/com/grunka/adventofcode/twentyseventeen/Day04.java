@@ -1,4 +1,4 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Day4 {
+public class Day04 {
     private static final String INPUT = "pphsv ojtou brvhsj cer ntfhlra udeh ccgtyzc zoyzmh jum lugbnk\n" +
             "vxjnf fzqitnj uyfck blnl impo kxoow nngd worcm bdesehw\n" +
             "caibh nfuk kfnu llfdbz uxjty yxjut jcea\n" +

@@ -1,10 +1,10 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.grunka.adventofcode.Day22.Direction.UP;
+import static com.grunka.adventofcode.twentyseventeen.Day22.Direction.UP;
 
 public class Day22 {
     public static void main(String[] args) {

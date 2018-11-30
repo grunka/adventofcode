@@ -1,10 +1,10 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Day6 {
+public class Day06 {
     private static final String INPUT = "4\t1\t15\t12\t0\t9\t9\t5\t5\t8\t7\t3\t14\t5\t12\t3";
     private static final String TEST_INPUT = "0\t2\t7\t0";
 

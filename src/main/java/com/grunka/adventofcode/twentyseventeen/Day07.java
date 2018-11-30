@@ -1,10 +1,10 @@
-package com.grunka.adventofcode;
+package com.grunka.adventofcode.twentyseventeen;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Day7 {
+public class Day07 {
     public static void main(String[] args) {
         part1(parseTree(TEST_INPUT));
         part1(parseTree(INPUT));
