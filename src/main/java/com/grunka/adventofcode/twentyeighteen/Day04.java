@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,36 @@ public class Day04 {
 
     public static void main(String[] args) throws URISyntaxException, IOException {
         part1();
+        part2();
+    }
+
+    private static void part2() throws IOException, URISyntaxException {
+        List<Entry> entries = getEntries();
+        Map<Integer, List<Integer>> guardMinutes = new TreeMap<>();
+        List<Entry> sleepWakes = entries.stream().filter(e -> "sleep".equals(e.action) || "wake".equals(e.action)).collect(Collectors.toList());
+        for (int i = 0; i < sleepWakes.size(); i += 2) {
+            Entry sleep = sleepWakes.get(i);
+            Entry wake = sleepWakes.get(i + 1);
+            if (!"sleep".equals(sleep.action)) {
+                throw new Error("Wrong order");
+            }
+            if (!"wake".equals(wake.action)) {
+                throw new Error("Wrong order");
+            }
+            if (sleep.guard != wake.guard) {
+                throw new Error("Guard mismatch");
+            }
+            int minutes = sleep.time.getMinutes(wake.time);
+            for (int j = 0; j < minutes; j++) {
+                guardMinutes.compute((sleep.time.minute + j) % 60, (m, c) -> {
+                    if (c == null) {
+                        c = new ArrayList<>();
+                    }
+                    c.add(sleep.guard);
+                    return c;
+                });
+            }
+        }
     }
 
     private static void part1() throws IOException, URISyntaxException {
