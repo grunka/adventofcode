@@ -26,13 +26,17 @@ public class Day04 {
                 counts.compute(e.guard, (k, count) -> count == null ? minutes : minutes + count);
             }
         }
-        Integer sleepyGuard = counts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).orElseThrow().getKey();
-        List<Entry> guardEntries = entries.stream().filter(e -> e.guard == sleepyGuard).collect(Collectors.toList());
+        int sleepyGuard = counts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).orElseThrow().getKey();
         long largestCount = -1;
         int largestMinute = -1;
         for (int i = 0; i < 59; i++) {
             int minute = i;
-            long minuteCount = guardEntries.stream().filter(e -> e.time.minute == minute).count();
+            long minuteCount = entries.stream()
+                    .filter(e -> e.guard == sleepyGuard)
+                    .filter(e -> e.time.minute == minute)
+                    .count();
+            System.out.println("minute = " + minute);
+            System.out.println("minuteCount = " + minuteCount);
             if (minuteCount > largestCount) {
                 largestCount = minuteCount;
                 largestMinute = minute;
@@ -40,12 +44,11 @@ public class Day04 {
         }
         System.out.println("largestCount = " + largestCount);
         System.out.println("largestMinute = " + largestMinute);
-        System.out.println("sleepyGuard = " + sleepyGuard);
         System.out.println("Part 1 result: " + largestMinute * sleepyGuard);
     }
 
     private static List<Entry> getEntries() throws IOException, URISyntaxException {
-        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-1.txt").toURI()));
+        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-test.txt").toURI()));
         Collections.sort(lines);
         AtomicInteger currentGuard = new AtomicInteger();
         return lines.stream().map(line -> {
@@ -54,11 +57,11 @@ public class Day04 {
                 throw new Error("Could not match line");
             }
             Time time = new Time(
-                    Integer.parseInt(matcher.group(1)),
-                    Integer.parseInt(matcher.group(2)),
-                    Integer.parseInt(matcher.group(3)),
-                    Integer.parseInt(matcher.group(4)),
-                    Integer.parseInt(matcher.group(5))
+                    Integer.parseInt(matcher.group(1), 10),
+                    Integer.parseInt(matcher.group(2), 10),
+                    Integer.parseInt(matcher.group(3), 10),
+                    Integer.parseInt(matcher.group(4), 10),
+                    Integer.parseInt(matcher.group(5), 10)
             );
             String rest = matcher.group(6);
             String action;
@@ -122,7 +125,7 @@ public class Day04 {
             if (day != other.day) {
                 throw new Error("Different day");
             }
-            return (other.hour - hour) * 60 + other.minute + minute + 1;
+            return (hour - other.hour) * 60 + minute - other.minute;
         }
 
         @Override
