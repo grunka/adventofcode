@@ -17,6 +17,10 @@ public class Day04 {
     private static final Pattern LINE = Pattern.compile("^\\[(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2})] (.*)$");
 
     public static void main(String[] args) throws URISyntaxException, IOException {
+        part1();
+    }
+
+    private static void part1() throws IOException, URISyntaxException {
         List<Entry> entries = getEntries();
         Map<Integer, Integer> counts = new TreeMap<>();
         for (int i = 1; i < entries.size(); i++) {
@@ -51,7 +55,7 @@ public class Day04 {
     }
 
     private static List<Entry> getEntries() throws IOException, URISyntaxException {
-        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-test.txt").toURI()));
+        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-1.txt").toURI()));
         Collections.sort(lines);
         AtomicInteger currentGuard = new AtomicInteger();
         return lines.stream().map(line -> {
