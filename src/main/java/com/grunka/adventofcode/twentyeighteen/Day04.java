@@ -5,9 +5,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,32 +18,35 @@ public class Day04 {
 
     public static void main(String[] args) throws URISyntaxException, IOException {
         List<Entry> entries = getEntries();
-        Map<Integer, Integer> counts = new HashMap<>();
+        Map<Integer, Integer> counts = new TreeMap<>();
         for (int i = 1; i < entries.size(); i++) {
             Entry e = entries.get(i);
             if ("wake".equals(e.action)) {
-                int minutes = e.time.getMinutes(entries.get(i - 1).time);
+                int minutes = entries.get(i - 1).time.getMinutes(e.time);
                 counts.compute(e.guard, (k, count) -> count == null ? minutes : minutes + count);
             }
         }
         int sleepyGuard = counts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).orElseThrow().getKey();
-        long largestCount = -1;
-        int largestMinute = -1;
-        for (int i = 0; i < 59; i++) {
-            int minute = i;
-            long minuteCount = entries.stream()
-                    .filter(e -> e.guard == sleepyGuard)
-                    .filter(e -> e.time.minute == minute)
-                    .count();
-            System.out.println("minute = " + minute);
-            System.out.println("minuteCount = " + minuteCount);
-            if (minuteCount > largestCount) {
-                largestCount = minuteCount;
-                largestMinute = minute;
+        List<Entry> sleepyEntries = entries.stream()
+                .filter(e -> e.guard == sleepyGuard)
+                .filter(e -> "sleep".equals(e.action) || "wake".equals(e.action))
+                .collect(Collectors.toList());
+        Map<Integer, Integer> minuteCounts = new TreeMap<>();
+        for (int i = 0; i < sleepyEntries.size(); i += 2) {
+            Entry sleep = sleepyEntries.get(i);
+            Entry wake = sleepyEntries.get(i + 1);
+            if (!"sleep".equals(sleep.action)) {
+                throw new Error("Wrong order");
+            }
+            if (!"wake".equals(wake.action)) {
+                throw new Error("Wrong order");
+            }
+            int minutes = sleep.time.getMinutes(wake.time);
+            for (int j = 0; j < minutes; j++) {
+                minuteCounts.compute((sleep.time.minute + j) % 60, (m, c) -> c == null ? 1 : c + 1);
             }
         }
-        System.out.println("largestCount = " + largestCount);
-        System.out.println("largestMinute = " + largestMinute);
+        Integer largestMinute = minuteCounts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).map(Map.Entry::getKey).orElseThrow();
         System.out.println("Part 1 result: " + largestMinute * sleepyGuard);
     }
 
@@ -92,11 +95,7 @@ public class Day04 {
 
         @Override
         public String toString() {
-            return "Entry{" +
-                    "time=" + time +
-                    ", guard=" + guard +
-                    ", action='" + action + '\'' +
-                    '}';
+            return "[" + time + "] #" + guard + " " + action;
         }
     }
 
@@ -115,7 +114,7 @@ public class Day04 {
             this.minute = minute;
         }
 
-        public int getMinutes(Time other) {
+        int getMinutes(Time other) {
             if (year != other.year) {
                 throw new Error("Different year");
             }
@@ -125,18 +124,12 @@ public class Day04 {
             if (day != other.day) {
                 throw new Error("Different day");
             }
-            return (hour - other.hour) * 60 + minute - other.minute;
+            return (other.hour - hour) * 60 + other.minute - minute;
         }
 
         @Override
         public String toString() {
-            return "Time{" +
-                    "year=" + year +
-                    ", month=" + month +
-                    ", day=" + day +
-                    ", hour=" + hour +
-                    ", minute=" + minute +
-                    '}';
+            return String.format("%d-%02d-%02d %02d:%02d", year, month, day, hour, minute);
         }
     }
 }
