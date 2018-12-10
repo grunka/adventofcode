@@ -29,7 +29,12 @@ public class Day03 {
                 .map(Claim::fromString)
                 .peek(c -> claimIds.add(c.id))
                 .flatMap(Claim::toPoints)
-                .collect(Collectors.toMap(p -> p, p -> Set.of(p.claimId), (a, b) -> Stream.of(a, b).flatMap(Collection::stream).collect(Collectors.toSet())))
+                .collect(Collectors.toMap(
+                        p -> p,
+                        p -> Set.of(p.claimId),
+                        (a, b) -> Stream.of(a, b)
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toSet())))
                 .values().stream().filter(c -> c.size() > 1).forEach(claimIds::removeAll);
         if (claimIds.size() != 1) {
             throw new Error("Found the wrong amount of claims " + claimIds);
