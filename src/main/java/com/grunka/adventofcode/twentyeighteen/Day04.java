@@ -38,7 +38,23 @@ public class Day04 {
                                 (x, y) -> x + y
                         ))
         ));
-        System.out.println("countsPerMinute = " + countsPerMinute);
+        //System.out.println("countsPerMinute = " + countsPerMinute);
+        int largestCount = -1;
+        int guard = -1;
+        int minute = -1;
+        for (Map.Entry<Integer, Map<Integer, Integer>> minuteEntry : countsPerMinute.entrySet()) {
+            for (Map.Entry<Integer, Integer> guardEntry : minuteEntry.getValue().entrySet()) {
+                if (guardEntry.getValue() > largestCount) {
+                    largestCount  = guardEntry.getValue();
+                    guard = guardEntry.getKey();
+                    minute = minuteEntry.getKey();
+                }
+            }
+        }
+        //System.out.println("minute = " + minute);
+        //System.out.println("guard = " + guard);
+        //System.out.println("largestCount = " + largestCount);
+        System.out.println("Part 2 result: " + minute * guard);
     }
 
     private static void part1() throws IOException, URISyntaxException {
@@ -51,7 +67,7 @@ public class Day04 {
 
     private static Stream<MinuteState> minuteStream() throws IOException, URISyntaxException {
         AtomicReference<Entry> previousEntry = new AtomicReference<>();
-        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-test.txt").toURI()));
+        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-1.txt").toURI()));
         Collections.sort(lines);
         AtomicInteger currentGuard = new AtomicInteger();
         return lines.stream().map(line -> {
