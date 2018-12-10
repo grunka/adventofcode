@@ -18,7 +18,7 @@ public class Day06 {
                 .map(line -> line.split(", "))
                 .map(s -> new Point(Integer.parseInt(s[0]), Integer.parseInt(s[1])))
                 .collect(Collectors.toList());
-        System.out.println("points = " + points);
+        //System.out.println("points = " + points);
 
         Box boundingBox = getBoundingBox(points);
         Map<Point, Integer> owners = new HashMap<>();
@@ -36,18 +36,20 @@ public class Day06 {
             }
         }
         //System.out.println("owners = " + owners);
-        printBox(boundingBox, owners);
+        //printBox(boundingBox, owners);
 
         Set<Integer> edgePoints = new HashSet<>();
-        for (int i = 0; i < points.size(); i++) {
-            Point p = points.get(i);
-            if (p.x == boundingBox.topLeft.x || p.x == boundingBox.bottomRight.x || p.y == boundingBox.topLeft.y || p.y == boundingBox.bottomRight.y) {
-                edgePoints.add(i);
-            }
+        for (int x = boundingBox.topLeft.x; x <= boundingBox.bottomRight.x; x++) {
+            edgePoints.add(owners.get(new Point(x, boundingBox.topLeft.y)));
+            edgePoints.add(owners.get(new Point(x, boundingBox.bottomRight.y)));
+        }
+        for (int y = boundingBox.topLeft.y; y <= boundingBox.bottomRight.y; y++) {
+            edgePoints.add(owners.get(new Point(boundingBox.topLeft.x, y)));
+            edgePoints.add(owners.get(new Point(boundingBox.bottomRight.x, y)));
         }
         //System.out.println("edgePoints = " + edgePoints);
         owners.entrySet().removeIf(e -> edgePoints.contains(e.getValue()));
-        printBox(boundingBox, owners);
+        //printBox(boundingBox, owners);
         //System.out.println("owners = " + owners);
         Map<Integer, Integer> sizes = owners.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, e -> 1, (a, b) -> a + b));
         //System.out.println("sizes = " + sizes);
