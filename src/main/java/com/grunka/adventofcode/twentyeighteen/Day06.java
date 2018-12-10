@@ -21,6 +21,24 @@ public class Day06 {
         //System.out.println("points = " + points);
 
         Box boundingBox = getBoundingBox(points);
+        part1(points, boundingBox);
+        part2(points, boundingBox);
+    }
+
+    private static void part2(List<Point> points, Box boundingBox) {
+        Map<Point, Integer> distanceSums = new HashMap<>();
+        for (int x = boundingBox.topLeft.x; x <= boundingBox.bottomRight.x; x++) {
+            for (int y = boundingBox.topLeft.y; y <= boundingBox.bottomRight.y; y++) {
+                Point here = new Point(x, y);
+                distanceSums.put(here, points.stream().mapToInt(p -> distance(p, here)).sum());
+                //printBox(boundingBox, owners);
+            }
+        }
+        long size = distanceSums.entrySet().stream().filter(e -> e.getValue() < 10_000).count();
+        System.out.println("Part 2 result: " + size);
+    }
+
+    private static void part1(List<Point> points, Box boundingBox) {
         Map<Point, Integer> owners = new HashMap<>();
         for (int x = boundingBox.topLeft.x; x <= boundingBox.bottomRight.x; x++) {
             for (int y = boundingBox.topLeft.y; y <= boundingBox.bottomRight.y; y++) {
