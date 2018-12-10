@@ -4,15 +4,17 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Day04 {
     private static final Pattern LINE = Pattern.compile("^\\[(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2})] (.*)$");
@@ -23,70 +25,33 @@ public class Day04 {
     }
 
     private static void part2() throws IOException, URISyntaxException {
-        List<Entry> entries = getEntries();
-        Map<Integer, List<Integer>> guardMinutes = new TreeMap<>();
-        List<Entry> sleepWakes = entries.stream().filter(e -> "sleep".equals(e.action) || "wake".equals(e.action)).collect(Collectors.toList());
-        for (int i = 0; i < sleepWakes.size(); i += 2) {
-            Entry sleep = sleepWakes.get(i);
-            Entry wake = sleepWakes.get(i + 1);
-            if (!"sleep".equals(sleep.action)) {
-                throw new Error("Wrong order");
-            }
-            if (!"wake".equals(wake.action)) {
-                throw new Error("Wrong order");
-            }
-            if (sleep.guard != wake.guard) {
-                throw new Error("Guard mismatch");
-            }
-            int minutes = sleep.time.getMinutes(wake.time);
-            for (int j = 0; j < minutes; j++) {
-                guardMinutes.compute((sleep.time.minute + j) % 60, (m, c) -> {
-                    if (c == null) {
-                        c = new ArrayList<>();
-                    }
-                    c.add(sleep.guard);
-                    return c;
-                });
-            }
-        }
+        // map<minute,map<guard,count>>
+        Map<Integer, Map<Integer, Integer>> countsPerMinute = minuteStream().filter(m -> "sleep".equals(m.state)).collect(Collectors.toMap(
+                m -> m.minute,
+                m -> Map.of(m.guard, 1),
+                (a, b) -> Stream.of(a, b)
+                        .map(Map::entrySet)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (x, y) -> x + y
+                        ))
+        ));
+        System.out.println("countsPerMinute = " + countsPerMinute);
     }
 
     private static void part1() throws IOException, URISyntaxException {
-        List<Entry> entries = getEntries();
-        Map<Integer, Integer> counts = new TreeMap<>();
-        for (int i = 1; i < entries.size(); i++) {
-            Entry e = entries.get(i);
-            if ("wake".equals(e.action)) {
-                int minutes = entries.get(i - 1).time.getMinutes(e.time);
-                counts.compute(e.guard, (k, count) -> count == null ? minutes : minutes + count);
-            }
-        }
+        Map<Integer, Integer> counts = minuteStream().filter(s -> "sleep".equals(s.state)).collect(Collectors.toMap(s -> s.guard, s -> 1, (a, b) -> a + b));
         int sleepyGuard = counts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).orElseThrow().getKey();
-        List<Entry> sleepyEntries = entries.stream()
-                .filter(e -> e.guard == sleepyGuard)
-                .filter(e -> "sleep".equals(e.action) || "wake".equals(e.action))
-                .collect(Collectors.toList());
-        Map<Integer, Integer> minuteCounts = new TreeMap<>();
-        for (int i = 0; i < sleepyEntries.size(); i += 2) {
-            Entry sleep = sleepyEntries.get(i);
-            Entry wake = sleepyEntries.get(i + 1);
-            if (!"sleep".equals(sleep.action)) {
-                throw new Error("Wrong order");
-            }
-            if (!"wake".equals(wake.action)) {
-                throw new Error("Wrong order");
-            }
-            int minutes = sleep.time.getMinutes(wake.time);
-            for (int j = 0; j < minutes; j++) {
-                minuteCounts.compute((sleep.time.minute + j) % 60, (m, c) -> c == null ? 1 : c + 1);
-            }
-        }
+        Map<Integer, Integer> minuteCounts = minuteStream().filter(s -> s.guard == sleepyGuard).filter(s -> "sleep".equals(s.state)).collect(Collectors.toMap(s -> s.minute, s -> 1, (a, b) -> a + b));
         Integer largestMinute = minuteCounts.entrySet().stream().reduce((a, b) -> a.getValue() > b.getValue() ? a : b).map(Map.Entry::getKey).orElseThrow();
         System.out.println("Part 1 result: " + largestMinute * sleepyGuard);
     }
 
-    private static List<Entry> getEntries() throws IOException, URISyntaxException {
-        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-1.txt").toURI()));
+    private static Stream<MinuteState> minuteStream() throws IOException, URISyntaxException {
+        AtomicReference<Entry> previousEntry = new AtomicReference<>();
+        List<String> lines = Files.readAllLines(Paths.get(Day04.class.getResource("/twentyeighteen/Day04-test.txt").toURI()));
         Collections.sort(lines);
         AtomicInteger currentGuard = new AtomicInteger();
         return lines.stream().map(line -> {
@@ -114,7 +79,30 @@ public class Day04 {
                 throw new Error("Could not figure out " + rest);
             }
             return new Entry(time, currentGuard.get(), action);
-        }).collect(Collectors.toList());
+        }).map(current -> {
+            Entry previous = previousEntry.get();
+            previousEntry.set(current);
+            if (previous == null) {
+                return Collections.<MinuteState>emptyList();
+            } else {
+                String state = "begin".equals(previous.action) ? "wake" : previous.action;
+                return IntStream.range(previous.time.minute, previous.time.minute + previous.time.getMinutes(current.time))
+                        .mapToObj(m -> new MinuteState(previous.guard, m % 60, state))
+                        .collect(Collectors.toList());
+            }
+        }).flatMap(Collection::stream);
+    }
+
+    private static class MinuteState {
+        final int guard;
+        final int minute;
+        final String state;
+
+        private MinuteState(int guard, int minute, String state) {
+            this.guard = guard;
+            this.minute = minute;
+            this.state = state;
+        }
     }
 
     private static class Entry {
@@ -153,13 +141,14 @@ public class Day04 {
             if (year != other.year) {
                 throw new Error("Different year");
             }
+            int dayOffset = 0;
             if (month != other.month) {
-                throw new Error("Different month");
+                dayOffset = 24 * 60;
             }
             if (day != other.day) {
-                throw new Error("Different day");
+                dayOffset = (other.day - day) * 24 * 60;
             }
-            return (other.hour - hour) * 60 + other.minute - minute;
+            return (other.hour - hour) * 60 + other.minute - minute + dayOffset;
         }
 
         @Override
