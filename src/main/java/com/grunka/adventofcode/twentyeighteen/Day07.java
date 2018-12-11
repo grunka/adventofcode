@@ -6,9 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,23 +23,29 @@ public class Day07 {
 
     private static void part2() throws URISyntaxException, IOException {
         Map<String, List<String>> prerequisites = getPrerequisites();
-        System.out.print("Part 2 result: ");
-        Map<String, Integer> activeWork = new HashMap<>();
+        Map<String, Integer> activeWork = new TreeMap<>();
         final int workers = 5;
         final int extraWork = 60;
+        long second = 0;
+        List<String> completed = new ArrayList<>();
         while (!prerequisites.isEmpty() || !activeWork.isEmpty()) {
-            activeWork.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
             List<String> finishedWork = activeWork.entrySet().stream().filter(e -> e.getValue() == 0).map(Map.Entry::getKey).collect(Collectors.toList());
             finishedWork.forEach(finished -> {
-                System.out.print(finished);
+                completed.add(finished);
                 activeWork.remove(finished);
                 prerequisites.remove(finished);
                 prerequisites.values().forEach(l -> l.remove(finished));
             });
+
             List<String> queue = prerequisites.entrySet().stream().filter(e -> e.getValue().isEmpty()).map(Map.Entry::getKey).filter(w -> !activeWork.containsKey(w)).sorted().collect(Collectors.toList());
             queue.subList(0, Math.min(workers - activeWork.size(), queue.size())).forEach(work -> activeWork.put(work, extraWork + toWorkTime(work)));
+
+            activeWork.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
+
+            System.out.println(String.format("% 4d %s", second, String.join(" ", activeWork.keySet())));
+            second++;
         }
-        System.out.println();
+        System.out.println("Part 2 result: " + String.join("", completed));
     }
 
     private static int toWorkTime(String work) {
