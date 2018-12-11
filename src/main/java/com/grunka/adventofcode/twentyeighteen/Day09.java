@@ -1,15 +1,21 @@
 package com.grunka.adventofcode.twentyeighteen;
 
+import java.util.Arrays;
+
 public class Day09 {
     public static void main(String[] args) {
+        System.out.println("Part 1 result: " + Arrays.stream(calculateScores(468, 71843)).max().orElseThrow());
+        System.out.println("Part 2 result: " + Arrays.stream(calculateScores(468, 7184300)).max().orElseThrow());
+    }
+
+    private static long[] calculateScores(int players, int maxMarble) {
         Circle first = Circle.create();
         Circle current = first;
-
-        System.out.println(first);
-        int[] scores = new int[9];
+        //System.out.println(first);
+        long[] scores = new long[players];
         int player = 0;
         int marble = 1;
-        while (marble <= 25) {
+        while (marble <= maxMarble) {
             if (marble % 23 == 0) {
                 scores[player] += marble;
                 Circle extra = current.counterClockwise.counterClockwise.counterClockwise.counterClockwise.counterClockwise.counterClockwise.counterClockwise;
@@ -19,9 +25,11 @@ public class Day09 {
                 current = current.clockwise.insertAfter(marble);
             }
             marble++;
-            player = (player + 1) % scores.length;
-            System.out.println(first);
+            player = (player + 1) % players;
+            //System.out.println(first);
         }
+        //System.out.println("scores = " + Arrays.toString(scores));
+        return scores;
     }
 
     private static class Circle {
