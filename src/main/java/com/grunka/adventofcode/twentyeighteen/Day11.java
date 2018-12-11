@@ -23,7 +23,7 @@ public class Day11 {
         int maxY = -1;
         int maxSize = -1;
         int max = -1;
-        for (int size = 1; size < 300; size++) {
+        for (int size = 1; size <= 300; size++) {
             for (int y = 1; y <= 300 - size; y++) {
                 for (int x = 1; x <= 300 - size; x++) {
                     int powerLevel = powerLevelGrid(x, y, size);
