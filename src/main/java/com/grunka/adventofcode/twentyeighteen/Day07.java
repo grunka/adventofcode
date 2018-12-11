@@ -42,10 +42,10 @@ public class Day07 {
 
             activeWork.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
 
-            System.out.println(String.format("% 4d %s", second, String.join(" ", activeWork.keySet())));
+            //System.out.println(String.format("% 4d %s", second, String.join(" ", activeWork.keySet())));
             second++;
         }
-        System.out.println("Part 2 result: " + String.join("", completed));
+        System.out.println("Part 2 result: " + String.join("", completed) + " in " + (second - 1) + " seconds");
     }
 
     private static int toWorkTime(String work) {
