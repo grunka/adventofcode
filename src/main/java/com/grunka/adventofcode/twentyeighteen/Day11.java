@@ -2,10 +2,20 @@ package com.grunka.adventofcode.twentyeighteen;
 
 public class Day11 {
     private static final int GRID_SERIAL_NUMBER = 9005;
+    private static final int[][] GRID = new int[300][300];
 
     public static void main(String[] args) {
+        fillGrid();
         part1();
         part2();
+    }
+
+    private static void fillGrid() {
+        for (int x = 0; x < 300; x++) {
+            for (int y = 0; y < 300; y++) {
+                GRID[x][y] = powerLevel(x + 1, y + 1);
+            }
+        }
     }
 
     private static void part2() {
@@ -50,7 +60,7 @@ public class Day11 {
         int sum = 0;
         for (int a = 0; a < size; a++) {
             for (int b = 0; b < size; b++) {
-                sum += powerLevel(x + a, y + b);
+                sum += GRID[x + a - 1][y + b - 1];
             }
         }
         return sum;
