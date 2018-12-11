@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -17,6 +18,32 @@ public class Day07 {
 
     public static void main(String[] args) throws URISyntaxException, IOException {
         part1();
+        part2();
+    }
+
+    private static void part2() throws URISyntaxException, IOException {
+        Map<String, List<String>> prerequisites = getPrerequisites();
+        System.out.print("Part 2 result: ");
+        Map<String, Integer> activeWork = new HashMap<>();
+        final int workers = 5;
+        final int extraWork = 60;
+        while (!prerequisites.isEmpty() || !activeWork.isEmpty()) {
+            activeWork.entrySet().forEach(e -> e.setValue(e.getValue() - 1));
+            List<String> finishedWork = activeWork.entrySet().stream().filter(e -> e.getValue() == 0).map(Map.Entry::getKey).collect(Collectors.toList());
+            finishedWork.forEach(finished -> {
+                System.out.print(finished);
+                activeWork.remove(finished);
+                prerequisites.remove(finished);
+                prerequisites.values().forEach(l -> l.remove(finished));
+            });
+            List<String> queue = prerequisites.entrySet().stream().filter(e -> e.getValue().isEmpty()).map(Map.Entry::getKey).filter(w -> !activeWork.containsKey(w)).sorted().collect(Collectors.toList());
+            queue.subList(0, Math.min(workers - activeWork.size(), queue.size())).forEach(work -> activeWork.put(work, extraWork + toWorkTime(work)));
+        }
+        System.out.println();
+    }
+
+    private static int toWorkTime(String work) {
+        return work.charAt(0) - 'A' + 1;
     }
 
     private static void part1() throws IOException, URISyntaxException {
