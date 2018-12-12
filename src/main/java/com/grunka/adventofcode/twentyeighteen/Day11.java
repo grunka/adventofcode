@@ -1,5 +1,8 @@
 package com.grunka.adventofcode.twentyeighteen;
 
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class Day11 {
     private static final int GRID_SERIAL_NUMBER = 9005;
 
@@ -8,42 +11,81 @@ public class Day11 {
         part2();
     }
 
-    private static void part2() {
-        int maxX = -1;
-        int maxY = -1;
-        int maxSize = -1;
-        int max = -1;
-        for (int size = 1; size <= 300; size++) {
-            for (int y = 0; y < 300 - size; y++) {
-                for (int x = 0; x < 300 - size; x++) {
-                    int powerLevel = powerLevelGrid(x, y, size);
-                    if (powerLevel > max) {
-                        max = powerLevel;
-                        maxX = x;
-                        maxY = y;
-                        maxSize = size;
-                    }
-                }
-            }
+    private static class PowerGridView {
+        private final int x;
+        private final int y;
+        private final int size;
+        private final int level;
+
+        PowerGridView(int size) {
+            this.x = 0;
+            this.y = 0;
+            this.size = size;
+            this.level = powerLevelGrid(x, y, size);
         }
-        System.out.println("Part 2 result: " + (maxX + 1) + "," + (maxY + 1) + "," + maxSize);
+
+        PowerGridView(int x, int y, int size, int level) {
+            this.x = x;
+            this.y = y;
+            this.size = size;
+            this.level = level;
+        }
+
+        boolean hasRight() {
+            return x + size < 300;
+        }
+
+        boolean hasDown() {
+            return y + size < 300;
+        }
+
+        PowerGridView moveRight() {
+            int left = 0;
+            int right = 0;
+            for (int i = 0; i < size; i++) {
+                left += powerLevel(x, y + i);
+                right += powerLevel(x + size, y + i);
+            }
+            return new PowerGridView(x + 1, y, size, level - left + right);
+        }
+
+        PowerGridView moveDown() {
+            int top = 0;
+            int bottom = 0;
+            for (int i = 0; i < size; i++) {
+                top += powerLevel(x + i, y);
+                bottom += powerLevel(x + i, y + size);
+            }
+            return new PowerGridView(x, y + 1, size, level - top + bottom);
+        }
+
+        String toCoordinate() {
+            return (x + 1) + "," + (y + 1);
+        }
+
+        String toCoordinateAndSize() {
+            return (x + 1) + "," + (y + 1) + "," + size;
+        }
+    }
+
+    private static void part2() {
+        String maxCoordinateAndSize = IntStream.range(1, 301)
+                .parallel()
+                .mapToObj(size -> Stream.iterate(new PowerGridView(size), PowerGridView::hasDown, PowerGridView::moveDown)).flatMap(stream -> stream)
+                .map(view -> Stream.iterate(view, PowerGridView::hasRight, PowerGridView::moveRight)).flatMap(stream -> stream)
+                .reduce((a, b) -> a.level > b.level ? a : b)
+                .map(PowerGridView::toCoordinateAndSize)
+                .orElseThrow();
+        System.out.println("Part 2 result: " + maxCoordinateAndSize);
     }
 
     private static void part1() {
-        int maxX = -1;
-        int maxY = -1;
-        int max = -1;
-        for (int y = 0; y < 300 - 3; y++) {
-            for (int x = 0; x < 300 - 3; x++) {
-                int powerLevel = powerLevelGrid(x, y, 3);
-                if (powerLevel > max) {
-                    max = powerLevel;
-                    maxX = x;
-                    maxY = y;
-                }
-            }
-        }
-        System.out.println("Part 1 result: " + (maxX + 1) + "," + (maxY + 1));
+        String maxCoordinate = Stream.iterate(new PowerGridView(3), PowerGridView::hasDown, PowerGridView::moveDown)
+                .map(view -> Stream.iterate(view, PowerGridView::hasRight, PowerGridView::moveRight)).flatMap(stream -> stream)
+                .reduce((a, b) -> a.level > b.level ? a : b)
+                .map(PowerGridView::toCoordinate)
+                .orElseThrow();
+        System.out.println("Part 1 result: " + maxCoordinate);
     }
 
     private static int powerLevelGrid(int x, int y, int size) {
