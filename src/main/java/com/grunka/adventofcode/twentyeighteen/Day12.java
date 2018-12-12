@@ -21,7 +21,7 @@ public class Day12 {
         System.out.println("Part 2 result: " + doGenerations(state, transforms, 50_000_000_000L));
     }
 
-    private static int doGenerations(String state, Map<String, String> transforms, long generations) {
+    private static long doGenerations(String state, Map<String, String> transforms, long generations) {
         long zeroPosition = 0;
         for (long generation = 0; generation < generations; generation++) {
             if (!state.startsWith(".....")) {
@@ -32,19 +32,19 @@ public class Day12 {
                 state = state + ".....";
             }
             //System.out.println("state = " + state);
-            String newState = "";
+            StringBuilder newState = new StringBuilder();
             for (int i = 2; i < state.length() - 2; i++) {
                 String slice = state.substring(i - 2, i + 3);
                 //System.out.println("slice = " + slice);
-                newState += transforms.get(slice);
+                newState.append(transforms.get(slice));
             }
-            state = newState;
+            state = newState.toString();
             //System.out.println("state = " + state);
             zeroPosition -= 2;
         }
         //System.out.println("state = " + state);
         //System.out.println("zeroPosition = " + zeroPosition);
-        int sum = 0;
+        long sum = 0;
         for (int i = 0; i < state.length(); i++) {
             long pot = i - zeroPosition;
             if (state.charAt(i) == '#') {
