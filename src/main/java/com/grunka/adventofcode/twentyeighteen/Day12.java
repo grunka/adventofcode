@@ -16,9 +16,14 @@ public class Day12 {
         Map<String, String> transforms = lines.subList(2, lines.size()).stream()
                 .map(line -> line.split(" => "))
                 .collect(Collectors.toMap(s -> s[0], s -> s[1]));
-        System.out.println("transforms = " + transforms);
-        int zeroPosition = 0;
-        for (int generation = 0; generation < 20; generation++) {
+        //System.out.println("transforms = " + transforms);
+        System.out.println("Part 1 result: " + doGenerations(state, transforms, 20));
+        System.out.println("Part 2 result: " + doGenerations(state, transforms, 50_000_000_000L));
+    }
+
+    private static int doGenerations(String state, Map<String, String> transforms, long generations) {
+        long zeroPosition = 0;
+        for (long generation = 0; generation < generations; generation++) {
             if (!state.startsWith(".....")) {
                 state = "....." + state;
                 zeroPosition += 5;
@@ -26,7 +31,7 @@ public class Day12 {
             if (!state.endsWith(".....")) {
                 state = state + ".....";
             }
-            System.out.println("state = " + state);
+            //System.out.println("state = " + state);
             String newState = "";
             for (int i = 2; i < state.length() - 2; i++) {
                 String slice = state.substring(i - 2, i + 3);
@@ -34,18 +39,18 @@ public class Day12 {
                 newState += transforms.get(slice);
             }
             state = newState;
-            System.out.println("state = " + state);
+            //System.out.println("state = " + state);
             zeroPosition -= 2;
         }
-        System.out.println("state = " + state);
-        System.out.println("zeroPosition = " + zeroPosition);
+        //System.out.println("state = " + state);
+        //System.out.println("zeroPosition = " + zeroPosition);
         int sum = 0;
         for (int i = 0; i < state.length(); i++) {
-            int pot = i - zeroPosition;
+            long pot = i - zeroPosition;
             if (state.charAt(i) == '#') {
                 sum += pot;
             }
         }
-        System.out.println("Part 1 result: " + sum);
+        return sum;
     }
 }
