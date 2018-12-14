@@ -44,19 +44,19 @@ public class Day13 {
                 switch (track[x][y]) {
                     case '<':
                         track[x][y] = '-';
-                        carts.add(new Cart(x, y, "left"));
+                        carts.add(new Cart(x, y, Direction.LEFT, Choice.LEFT));
                         break;
                     case '>':
                         track[x][y] = '-';
-                        carts.add(new Cart(x, y, "right"));
+                        carts.add(new Cart(x, y, Direction.RIGHT, Choice.LEFT));
                         break;
                     case '^':
                         track[x][y] = '|';
-                        carts.add(new Cart(x, y, "up"));
+                        carts.add(new Cart(x, y, Direction.UP, Choice.LEFT));
                         break;
                     case 'V':
                         track[x][y] = '|';
-                        carts.add(new Cart(x, y, "down"));
+                        carts.add(new Cart(x, y, Direction.DOWN, Choice.LEFT));
                         break;
                     default:
                 }
@@ -69,11 +69,13 @@ public class Day13 {
         final int x;
         final int y;
         final Direction direction;
+        final Choice choice;
 
-        Cart(int x, int y, Direction direction) {
+        Cart(int x, int y, Direction direction, Choice choice) {
             this.x = x;
             this.y = y;
             this.direction = direction;
+            this.choice = choice;
         }
 
         Cart move(char[][] track) {
@@ -94,6 +96,7 @@ public class Day13 {
                     break;
             }
             Direction nextDirection = direction;
+            Choice nextChoice = choice;
             switch (track[nextX][nextY]) {
                 case '/':
                     nextDirection = direction == Direction.LEFT || direction == Direction.RIGHT ? direction.left() : direction.right();
@@ -102,10 +105,11 @@ public class Day13 {
                     nextDirection = direction == Direction.LEFT || direction == Direction.RIGHT ? direction.right() : direction.left();
                     break;
                 case '+':
-                    //TODO
+                    nextDirection = choice.choose(direction);
+                    nextChoice = choice.next();
                     break;
             }
-            return this;
+            return new Cart(nextX, nextY, nextDirection, nextChoice);
         }
 
         @Override
@@ -163,6 +167,34 @@ public class Day13 {
                 System.out.print(track[x][y]);
             }
             System.out.println();
+        }
+    }
+
+    private enum Choice {
+        LEFT, STRAIGHT, RIGHT;
+
+        Choice next() {
+            switch (this) {
+                case LEFT:
+                    return STRAIGHT;
+                case STRAIGHT:
+                    return RIGHT;
+                case RIGHT:
+                    return LEFT;
+            }
+            throw new IllegalStateException();
+        }
+
+        Direction choose(Direction direction) {
+            switch (this) {
+                case LEFT:
+                    return direction.left();
+                case STRAIGHT:
+                    return direction;
+                case RIGHT:
+                    return direction.right();
+            }
+            throw new IllegalStateException();
         }
     }
 }
