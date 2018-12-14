@@ -6,9 +6,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Day13 {
     public static void main(String[] args) throws URISyntaxException, IOException {
@@ -30,11 +31,24 @@ public class Day13 {
         //print(track);
 
         List<Cart> carts = getCarts(track, width, height);
-        Collections.shuffle(carts);
         Collections.sort(carts);
-        System.out.println("carts = " + carts);
-        carts = carts.stream().map(c -> c.move(track)).sorted().collect(Collectors.toList());
-        System.out.println("carts = " + carts);
+        //print(track, carts);
+        List<Cart> movedCarts = new ArrayList<>();
+        while (true) {
+            while (!carts.isEmpty()) {
+                Cart movedCart = carts.remove(0).move(track);
+                boolean collided = Stream.of(movedCarts, carts).flatMap(Collection::stream).anyMatch(c -> c.x == movedCart.x && c.y == movedCart.y);
+                if (collided) {
+                    System.out.println("Part 1 result: " + movedCart.x + "," + movedCart.y);
+                    System.exit(0);
+                }
+                movedCarts.add(movedCart);
+            }
+            carts.addAll(movedCarts);
+            movedCarts.clear();
+            Collections.sort(carts);
+            System.out.println("carts = " + carts);
+        }
     }
 
     private static List<Cart> getCarts(char[][] track, int width, int height) {
@@ -161,9 +175,10 @@ public class Day13 {
         }
     }
 
-    private static void print(char[][] track) {
+    private static void print(char[][] track, List<Cart> carts) {
         for (int y = 0; y < track[0].length; y++) {
             for (int x = 0; x < track.length; x++) {
+                //carts.stream().filter(c -> c.x == x && c.y == y);
                 System.out.print(track[x][y]);
             }
             System.out.println();
