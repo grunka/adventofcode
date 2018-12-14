@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class Day13 {
@@ -28,26 +31,34 @@ public class Day13 {
                 }
             }
         }
-        //print(track);
 
         List<Cart> carts = getCarts(track, width, height);
         Collections.sort(carts);
-        //print(track, carts);
         List<Cart> movedCarts = new ArrayList<>();
-        while (true) {
+        boolean firstCollision = true;
+        while (!carts.isEmpty()) {
             while (!carts.isEmpty()) {
                 Cart movedCart = carts.remove(0).move(track);
-                boolean collided = Stream.of(movedCarts, carts).flatMap(Collection::stream).anyMatch(c -> c.x == movedCart.x && c.y == movedCart.y);
-                if (collided) {
-                    System.out.println("Part 1 result: " + movedCart.x + "," + movedCart.y);
-                    System.exit(0);
+                Optional<Cart> collided = Stream.of(movedCarts, carts).flatMap(Collection::stream).filter(c -> c.x == movedCart.x && c.y == movedCart.y).findFirst();
+                if (collided.isPresent()) {
+                    if (firstCollision) {
+                        System.out.println("Part 1 result: " + movedCart.x + "," + movedCart.y);
+                        firstCollision = false;
+                    }
+                    carts.remove(collided.get());
+                    movedCarts.remove(collided.get());
+
+                } else {
+                    movedCarts.add(movedCart);
                 }
-                movedCarts.add(movedCart);
             }
             carts.addAll(movedCarts);
             movedCarts.clear();
             Collections.sort(carts);
-            System.out.println("carts = " + carts);
+            if (carts.size() == 1) {
+                Cart lastCart = carts.remove(0);
+                System.out.println("Part 2 result: " + lastCart.x + "," + lastCart.y);
+            }
         }
     }
 
@@ -58,19 +69,19 @@ public class Day13 {
                 switch (track[x][y]) {
                     case '<':
                         track[x][y] = '-';
-                        carts.add(new Cart(x, y, Direction.LEFT, Choice.LEFT));
+                        carts.add(Cart.create(x, y, Direction.LEFT));
                         break;
                     case '>':
                         track[x][y] = '-';
-                        carts.add(new Cart(x, y, Direction.RIGHT, Choice.LEFT));
+                        carts.add(Cart.create(x, y, Direction.RIGHT));
                         break;
                     case '^':
                         track[x][y] = '|';
-                        carts.add(new Cart(x, y, Direction.UP, Choice.LEFT));
+                        carts.add(Cart.create(x, y, Direction.UP));
                         break;
-                    case 'V':
+                    case 'v':
                         track[x][y] = '|';
-                        carts.add(new Cart(x, y, Direction.DOWN, Choice.LEFT));
+                        carts.add(Cart.create(x, y, Direction.DOWN));
                         break;
                     default:
                 }
@@ -80,12 +91,18 @@ public class Day13 {
     }
 
     private static class Cart implements Comparable<Cart> {
+        final String uuid;
         final int x;
         final int y;
         final Direction direction;
         final Choice choice;
 
-        Cart(int x, int y, Direction direction, Choice choice) {
+        static Cart create(int x, int y, Direction direction) {
+            return new Cart(UUID.randomUUID().toString(), x, y, direction, Choice.LEFT);
+        }
+
+        private Cart(String uuid, int x, int y, Direction direction, Choice choice) {
+            this.uuid = uuid;
             this.x = x;
             this.y = y;
             this.direction = direction;
@@ -123,7 +140,7 @@ public class Day13 {
                     nextChoice = choice.next();
                     break;
             }
-            return new Cart(nextX, nextY, nextDirection, nextChoice);
+            return new Cart(uuid, nextX, nextY, nextDirection, nextChoice);
         }
 
         @Override
@@ -139,6 +156,23 @@ public class Day13 {
                     ", y=" + y +
                     ", direction='" + direction + '\'' +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Cart cart = (Cart) o;
+            return uuid.equals(cart.uuid);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uuid);
         }
     }
 
@@ -172,16 +206,6 @@ public class Day13 {
                     return UP;
             }
             throw new IllegalStateException();
-        }
-    }
-
-    private static void print(char[][] track, List<Cart> carts) {
-        for (int y = 0; y < track[0].length; y++) {
-            for (int x = 0; x < track.length; x++) {
-                //carts.stream().filter(c -> c.x == x && c.y == y);
-                System.out.print(track[x][y]);
-            }
-            System.out.println();
         }
     }
 
