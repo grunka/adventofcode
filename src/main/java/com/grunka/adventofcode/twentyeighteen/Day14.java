@@ -18,14 +18,14 @@ public class Day14 {
             if (newRecipe >= 10) {
                 recipes_length += 2;
                 if (recipes_length > recipes.length) {
-                    recipes = Arrays.copyOf(recipes, recipes.length * 2);
+                    recipes = Arrays.copyOf(recipes, recipes.length + 100);
                 }
                 recipes[recipes_length - 2] = newRecipe / 10;
                 recipes[recipes_length - 1] = newRecipe % 10;
             } else {
                 recipes_length++;
                 if (recipes_length > recipes.length) {
-                    recipes = Arrays.copyOf(recipes, recipes.length * 2);
+                    recipes = Arrays.copyOf(recipes, recipes.length + 100);
                 }
                 recipes[recipes_length - 1] = newRecipe;
             }
