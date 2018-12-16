@@ -1,6 +1,7 @@
 package com.grunka.adventofcode.twentyeighteen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,8 +11,11 @@ public class Day14 {
         int elf1 = 0;
         int elf2 = 1;
         //print(recipes, elf1, elf2);
+        boolean targetFound = false;
+        boolean otherTargetFound = false;
         int target = 846601;
-        while (recipes.size() < target + 10) {
+        List<Integer> otherTarget = Arrays.stream(String.valueOf(target).split("")).map(Integer::valueOf).collect(Collectors.toList());
+        while (!targetFound || !otherTargetFound) {
             int newRecipe = recipes.get(elf1) + recipes.get(elf2);
             if (newRecipe >= 10) {
                 recipes.add(newRecipe / 10);
@@ -22,11 +26,20 @@ public class Day14 {
             elf1 = (elf1 + recipes.get(elf1) + 1) % recipes.size();
             elf2 = (elf2 + recipes.get(elf2) + 1) % recipes.size();
             //print(recipes, elf1, elf2);
+            boolean targetIsFound = targetFound || recipes.size() >= target + 10;
+            if (!targetFound && targetIsFound) {
+                String result = recipes.subList(target, target + 10).stream().map(String::valueOf).collect(Collectors.joining());
+                System.out.println("Part 1 result: " + result);
+            }
+            targetFound = targetFound || targetIsFound;
+            boolean otherTargetIsFound = otherTargetFound || recipes.size() > otherTarget.size() && recipes.subList(recipes.size() - otherTarget.size(), recipes.size()).equals(otherTarget);
+            if (!otherTargetFound && otherTargetIsFound) {
+                System.out.println("Part 2 result: " + (recipes.size() - otherTarget.size()));
+            }
+            otherTargetFound = otherTargetFound || otherTargetIsFound;
         }
         //print(recipes, elf1, elf2);
         //System.out.println("recipes.size() = " + recipes.size());
-        String result = recipes.subList(target, target + 10).stream().map(String::valueOf).collect(Collectors.joining());
-        System.out.println("Part 1 result: " + result);
     }
 
     static void print(List<Integer> recipes, int elf1, int elf2) {
